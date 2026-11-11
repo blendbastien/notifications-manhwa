@@ -1,0 +1,1857 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notifications Manhwa</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@400;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" onerror="this.remove()"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#03050c;--panel:#080b16;--panel2:#05070f;--border:#161d33;--border2:#243052;
+  --text:#eef2fb;--text2:#aab4cc;--text3:#7a86a4;--accent:#38e0ff;
+  --t-bar1:#0e50aa;--t-bar2:#1462be;--t-bar3:#1868c8;
+  --t-main1:#1868d4;--t-main2:#1e7ae8;--t-main3:#2888f8;
+  --t-glow:rgba(120,210,255,.85);--t-border:rgba(80,160,255,.35);
+  --t-corner:rgba(160,230,255,.75);--t-side:#70c0ff;
+  --t-hline:rgba(160,230,255,.55);--t-hcenter:rgba(220,248,255,.95);
+  --t-card-border:#60a8ffaa;--t-card-border2:#1a6ad844;--t-card-inset:#80c0ff88;
+  --t-botbar-txt:rgba(150,200,255,.4);--t-scan:rgba(200,240,255,.35);--t-deco:rgba(150,220,255,.5);
+  --gold:#ffd070;--gold-d:#c9962f;
+}
+
+body{background:var(--bg);color:var(--text);font-family:'Crimson Text',Georgia,serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:22px 18px 70px;gap:16px;position:relative;
+  background-image:radial-gradient(ellipse 70% 45% at 50% -5%,rgba(60,40,160,.22),transparent 65%),radial-gradient(ellipse 50% 40% at 90% 95%,rgba(20,80,180,.14),transparent 60%),radial-gradient(ellipse 40% 40% at 5% 70%,rgba(120,30,120,.08),transparent 60%);}
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.app-layout,.app-header{position:relative;z-index:1;}
+
+/* ── LAYOUT ── */
+.app-layout{width:100%;max-width:1240px;display:grid;grid-template-columns:330px 1fr;gap:18px;align-items:start;}
+@media(max-width:900px){.app-layout{grid-template-columns:1fr;}}
+
+/* ── HEADER ── */
+.app-header{width:100%;max-width:1240px;text-align:center;padding:6px 0 2px;}
+.app-title{font-family:'Cinzel Decorative',serif;font-size:26px;font-weight:700;letter-spacing:.08em;color:var(--gold);text-shadow:0 0 34px rgba(255,208,112,.5),0 0 4px rgba(255,208,112,.5);position:relative;display:inline-block;padding:0 26px;}
+.app-title::before,.app-title::after{content:'';position:absolute;top:50%;width:70px;height:1px;background:linear-gradient(90deg,transparent,var(--gold-d));opacity:.7;}
+.app-title::before{right:100%;} .app-title::after{left:100%;transform:scaleX(-1);}
+.app-sub{font-family:'Share Tech Mono',monospace;font-size:8.5px;color:var(--text3);letter-spacing:.24em;margin-top:6px;}
+.app-sub::before{content:'[ ';color:var(--accent);opacity:.7;} .app-sub::after{content:' ]';color:var(--accent);opacity:.7;}
+
+/* ── FENÊTRES SYSTÈME (panneaux) ── */
+.win{background:linear-gradient(170deg,#0a0e1c,#060812);border:1px solid var(--border2);border-radius:4px;position:relative;box-shadow:0 14px 40px #00000088,inset 0 1px 0 #ffffff0a;}
+.win::before{content:'';position:absolute;top:0;left:24px;right:24px;height:1px;background:linear-gradient(90deg,transparent,#38e0ff55,transparent);pointer-events:none;}
+.win-hdr{background:#04060d;border-bottom:1px solid var(--border);padding:9px 14px;display:flex;align-items:center;gap:8px;border-radius:4px 4px 0 0;}
+.win-hdr .dots{display:flex;gap:4px;margin-right:4px;}
+.win-hdr .dots i{width:5px;height:5px;border-radius:50%;background:#38e0ff18;border:1px solid #38e0ff44;display:block;}
+.win-hdr .dots i:first-child{background:#38e0ff;box-shadow:0 0 6px #38e0ff;animation:pdot 2.2s infinite;}
+@keyframes pdot{0%,100%{opacity:1}50%{opacity:.3}}
+.win-title{font-family:'Cinzel',serif;font-size:11.5px;font-weight:700;letter-spacing:.2em;color:var(--gold);flex:1;}
+.win-sys{font-family:'Share Tech Mono',monospace;font-size:7.5px;color:#22406e;letter-spacing:.1em;margin-left:auto;}
+
+/* ── PANNEAU GAUCHE ── */
+.left-panel{display:flex;flex-direction:column;gap:12px;position:sticky;top:16px;}
+@media(max-width:900px){.left-panel{position:static;}}
+
+/* REGISTRE */
+.registry{overflow:hidden;}
+.registry-header{background:#04060d;border-bottom:1px solid var(--border);padding:9px 12px;display:flex;align-items:center;gap:8px;}
+.registry-title{font-family:'Cinzel',serif;font-size:11.5px;font-weight:700;letter-spacing:.2em;color:var(--gold);flex:1;}
+.reg-btn{font-family:'Share Tech Mono',monospace;font-size:7.5px;letter-spacing:.1em;padding:4px 9px;border-radius:2px;border:1px solid;cursor:pointer;background:transparent;transition:all .15s;white-space:nowrap;}
+.reg-btn-new{color:#60d080;border-color:#60d08055;}
+.reg-btn-new:hover{background:#60d08022;box-shadow:0 0 10px #60d08033;}
+.reg-btn-folder{color:var(--gold);border-color:#ffd07055;}
+.reg-btn-folder:hover{background:#ffd07018;box-shadow:0 0 10px #ffd07033;}
+.reg-search{padding:7px 10px;border-bottom:1px solid var(--border);background:#03050b;}
+.reg-search input{width:100%;background:#020308;border:1px solid var(--border);border-radius:2px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:9.5px;padding:6px 9px;outline:none;transition:.15s;}
+.reg-search input:focus{border-color:#38e0ff55;box-shadow:0 0 0 1px #38e0ff14;}
+.reg-body{max-height:420px;overflow-y:auto;padding:4px 0;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;}
+.reg-body::-webkit-scrollbar{width:4px;} .reg-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.reg-folder{border-bottom:1px solid var(--border);}
+.reg-folder-hdr{display:flex;align-items:center;gap:7px;padding:7px 12px;cursor:pointer;user-select:none;transition:background .15s;}
+.reg-folder-hdr:hover{background:#ffffff05;}
+.reg-folder-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.reg-folder-name{font-family:'Cinzel',serif;font-size:12px;font-weight:700;letter-spacing:.1em;flex:1;}
+.reg-folder-cat{font-family:'Share Tech Mono',monospace;font-size:6.5px;letter-spacing:.1em;opacity:.55;padding:1px 6px;border-radius:1px;border:1px solid currentColor;}
+.reg-folder-count{font-family:'Share Tech Mono',monospace;font-size:7.5px;color:var(--text3);margin-left:auto;}
+.reg-folder-arrow{font-size:8px;color:var(--text3);transition:transform .2s;flex-shrink:0;}
+.reg-folder-arrow.open{transform:rotate(90deg);}
+.reg-folder-del{font-size:9px;color:var(--text3);padding:2px 5px;cursor:pointer;border:none;background:transparent;opacity:0;transition:all .15s;}
+.reg-folder-hdr:hover .reg-folder-del{opacity:.6;}
+.reg-folder-del:hover{color:#ff4455;opacity:1 !important;}
+.reg-folder-body{display:none;padding:2px 0 4px 20px;}
+.reg-folder-body.open{display:block;}
+.reg-item{display:flex;align-items:center;gap:7px;padding:4px 10px;cursor:pointer;border-radius:2px;margin:1px 6px;transition:background .12s;border-left:2px solid transparent;}
+.reg-item:hover{background:#ffffff07;}
+.reg-item.selected{background:#38e0ff12;border-left-color:#38e0ff;}
+.reg-item-name{font-family:'Cinzel',serif;font-size:12px;letter-spacing:.06em;flex:1;color:var(--text);}
+.reg-item-del{font-size:9px;color:var(--text3);padding:2px 5px;cursor:pointer;border:none;background:transparent;opacity:0;transition:all .15s;}
+.reg-item:hover .reg-item-del{opacity:.6;}
+.reg-item-del:hover{color:#ff4455;opacity:1 !important;}
+.reg-empty{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text3);text-align:center;padding:20px;letter-spacing:.1em;}
+
+/* THÈMES */
+.theme-panel{padding:10px 12px 12px;}
+.theme-label{font-family:'Share Tech Mono',monospace;font-size:7.5px;color:var(--text3);letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+.theme-label::before{content:'◆';font-size:5px;color:var(--accent);}
+.theme-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.theme-groups{display:flex;flex-direction:column;gap:7px;}
+.theme-group-lbl{font-family:'Share Tech Mono',monospace;font-size:6.5px;color:var(--text3);letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px;}
+.theme-row{display:flex;gap:6px;flex-wrap:wrap;}
+.theme-btn{width:26px;height:26px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .15s;position:relative;outline:none;flex-shrink:0;background-image:radial-gradient(circle at 35% 30%,rgba(255,255,255,.45),transparent 45%) !important;background-blend-mode:screen;}
+.theme-btn:hover{transform:scale(1.18);}
+.theme-btn.active{border-color:#ffffff !important;box-shadow:0 0 10px #ffffffaa,0 0 0 3px #ffffff22 !important;}
+.theme-btn[title]:hover::before{content:attr(title);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:7px;color:#fff;background:#0a0a20;border:1px solid #2a2a50;padding:2px 7px;border-radius:2px;white-space:nowrap;z-index:100;pointer-events:none;}
+
+/* ── PANNEAU DROIT ── */
+.right-panel{display:flex;flex-direction:column;gap:14px;}
+
+/* CONTRÔLES */
+.controls{padding:12px 14px 14px;display:flex;flex-direction:column;gap:12px;}
+.ctrl-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;}
+.ctrl-group{display:flex;flex-direction:column;gap:5px;flex:1;min-width:140px;}
+.ctrl-group.fixed{flex:0 0 auto;}
+.ctrl-lbl{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:9.5px;color:#5a7aa8;letter-spacing:.16em;text-transform:uppercase;}
+.ctrl-group textarea{background:#02040a;border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:'Orbitron',monospace;font-size:10px;padding:8px 11px;outline:none;transition:border-color .2s,box-shadow .2s;width:100%;letter-spacing:.05em;resize:vertical;min-height:56px;line-height:1.6;}
+.ctrl-group textarea:focus,.ctrl-group input:focus,.ctrl-group select:focus{border-color:#38e0ff66;box-shadow:0 0 0 1px #38e0ff14,0 0 14px #38e0ff10;}
+.mk-toolbar{display:flex;gap:6px;margin-top:6px;align-items:center;}
+.mk-btn{background:#070a14;border:1px solid var(--border2);border-radius:2px;color:var(--text2);font-family:'Orbitron',monospace;font-size:8px;letter-spacing:.08em;padding:4px 9px;cursor:pointer;transition:all .15s;}
+.mk-btn:hover{border-color:var(--accent);color:#fff;}
+.mk-sep{width:1px;height:16px;background:var(--border2);margin:0 3px;}
+.mk-dot{width:18px;height:18px;border-radius:50%;border:1px solid color-mix(in srgb,var(--mc) 70%,#000);background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--mc) 60%,#fff),var(--mc) 60%,color-mix(in srgb,var(--mc) 55%,#000));cursor:pointer;box-shadow:0 0 6px color-mix(in srgb,var(--mc) 45%,transparent);transition:transform .12s,box-shadow .12s;padding:0;}
+.mk-dot:hover{transform:scale(1.25);box-shadow:0 0 12px var(--mc);}
+.notif-text .mk-or{color:#ffd700;text-shadow:0 0 8px #ffd700cc,0 0 18px #ffb00066;font-weight:700;}
+.notif-text .mk-sang{color:#ff2233;text-shadow:0 0 8px #d00016cc,0 0 18px #80000a99;font-weight:700;}
+.notif-text .mk-cyan{color:#00e8ff;text-shadow:0 0 8px #00d4ffcc,0 0 18px #0090c066;font-weight:700;}
+.notif-text .mk-violet{color:#c07aff;text-shadow:0 0 8px #a050ffcc,0 0 18px #601ea066;font-weight:700;}
+.notif-text .mk-vert{color:#4dff88;text-shadow:0 0 8px #20e060cc,0 0 18px #0a803066;font-weight:700;}
+.notif-text .mk-bleu{color:#4d9dff;text-shadow:0 0 8px #2a7ae8cc,0 0 18px #123c8866;font-weight:700;}
+.notif-text .mk-rose{color:#ff6ec7;text-shadow:0 0 8px #f040a8cc,0 0 18px #90105e66;font-weight:700;}
+.notif-text .mk-argent{color:#e8eef8;text-shadow:0 0 8px #c8d8f0cc,0 0 18px #8090b066;font-weight:700;}
+.ctrl-group input[type=text],.ctrl-group select{background:#02040a;border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:'Orbitron',monospace;font-size:10px;padding:8px 11px;outline:none;transition:border-color .2s,box-shadow .2s;width:100%;letter-spacing:.05em;}
+.ctrl-group select option{background:#06060e;}
+.btn-export{font-family:'Cinzel',serif;font-size:12px;font-weight:700;letter-spacing:.14em;padding:8px 16px;border-radius:3px;border:1px solid #38e0ff66;color:#38e0ff;background:linear-gradient(90deg,#03070f,#071530,#03070f);cursor:pointer;transition:all .18s;white-space:nowrap;height:36px;text-shadow:0 0 8px #38e0ff66;}
+.btn-export:hover{background:#38e0ff22;box-shadow:0 0 16px #38e0ff44;}
+
+/* Mode émetteur */
+.mode-row{display:flex;gap:6px;flex-wrap:wrap;}
+.mode-btn{font-family:'Share Tech Mono',monospace;font-size:10.5px;letter-spacing:.06em;padding:7px 13px;border-radius:3px;border:1px solid #2a3c6a;background:rgba(40,60,120,.14);color:#a8bce6;cursor:pointer;transition:all .15s;white-space:nowrap;position:relative;}
+.mode-btn:hover{color:#fff;border-color:#6a8ad8;background:rgba(60,90,180,.22);transform:translateY(-1px);}
+.mode-btn.active{color:#1a1208;border-color:var(--gold);background:linear-gradient(180deg,#ffe6a8,var(--gold));font-weight:700;box-shadow:0 0 16px -3px var(--gold);}
+
+/* ── NOTIFICATION CARD ── */
+.notif-wrap{width:100%;position:relative;}
+.notif-card{width:100%;position:relative;overflow:hidden;border-radius:6px;
+  box-shadow:0 0 0 2px var(--t-card-border),0 0 0 4px var(--t-card-border2),inset 0 1px 0 var(--t-card-inset),0 0 40px -6px var(--t-glow),0 26px 60px #00000099;
+  transition:box-shadow .3s;animation:notif-in .45s ease-out both;}
+@keyframes notif-in{from{opacity:0;transform:translateY(8px) scale(.985);filter:brightness(1.6) blur(2px);}to{opacity:1;transform:none;filter:none;}}
+.notif-topbar,.notif-botbar{height:30px;display:flex;align-items:center;background:linear-gradient(180deg,var(--t-bar1) 0%,var(--t-bar2) 50%,var(--t-bar3) 100%);border-bottom:2px solid var(--t-border);position:relative;transition:background .3s,border-color .3s;}
+.notif-botbar{background:linear-gradient(0deg,var(--t-bar1) 0%,var(--t-bar2) 50%,var(--t-bar3) 100%);border-bottom:none;border-top:2px solid var(--t-border);}
+.notif-topbar{justify-content:flex-end;padding:0 10px;gap:5px;}
+.notif-topbar-deco{position:absolute;left:10px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:3px;}
+.deco-corner{width:16px;height:16px;border-top:2px solid var(--t-deco);border-left:2px solid var(--t-deco);}
+.deco-corner2{width:8px;height:8px;border-top:1px solid var(--t-deco);border-left:1px solid var(--t-deco);}
+.notif-topbar-txt{position:absolute;left:44px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:7.5px;letter-spacing:.2em;color:var(--t-botbar-txt);display:flex;align-items:center;gap:7px;white-space:nowrap;}
+.notif-topbar-txt i{width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 6px #fff;display:block;animation:pdot 1.6s infinite;}
+.notif-cat{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:'Rajdhani',sans-serif;font-weight:700;font-size:9.5px;letter-spacing:.32em;text-transform:uppercase;color:rgba(255,255,255,.8);padding:2px 12px;border:1px solid rgba(255,255,255,.28);border-radius:2px;background:rgba(0,0,0,.18);white-space:nowrap;display:none;}
+.notif-cat.on{display:block;}
+.notif-cat b{font-weight:700;margin-right:6px;}
+.win-btn{width:16px;height:16px;border-radius:2px;border:1px solid var(--t-border);background:rgba(20,20,60,.5);display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,.7);font-family:'Share Tech Mono',monospace;cursor:default;}
+.notif-botbar-txt{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--t-botbar-txt);letter-spacing:.2em;position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;}
+.notif-botbar-deco{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:18px;height:18px;border-bottom:2px solid var(--t-deco);border-right:2px solid var(--t-deco);}
+.notif-botbar-left{position:absolute;left:12px;top:50%;transform:translateY(-50%);display:flex;gap:3px;}
+.notif-botbar-left i{width:3px;height:8px;background:var(--t-deco);display:block;opacity:.7;}
+.notif-botbar-left i:nth-child(2){height:11px;} .notif-botbar-left i:nth-child(3){height:6px;} .notif-botbar-left i:nth-child(4){height:9px;}
+.notif-main{background:linear-gradient(135deg,var(--t-main1) 0%,var(--t-main2) 25%,var(--t-main3) 55%,var(--t-main2) 80%,var(--t-main1) 100%);position:relative;transition:background .3s;}
+.notif-main::before{content:'';position:absolute;left:0;top:0;bottom:0;width:7px;background:linear-gradient(180deg,var(--t-side) 0%,transparent 8%,var(--t-side) 16%,transparent 24%,var(--t-side) 40%,transparent 48%,var(--t-side) 56%,transparent 64%,var(--t-side) 80%,transparent 88%,var(--t-side) 100%);opacity:.6;z-index:2;}
+.notif-main::after{content:'';position:absolute;right:0;top:0;bottom:0;width:7px;background:linear-gradient(180deg,transparent 0%,var(--t-side) 8%,transparent 20%,var(--t-side) 36%,transparent 52%,var(--t-side) 68%,transparent 80%,var(--t-side) 92%,transparent 100%);opacity:.45;z-index:2;}
+/* couches : trame hexagonale, éclat, étoiles, lignes d'écran */
+.n-hex{position:absolute;inset:0;pointer-events:none;opacity:.5;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='64' viewBox='0 0 56 64'%3E%3Cpath d='M28 2 L54 17 L54 47 L28 62 L2 47 L2 17 Z' fill='none' stroke='%23ffffff' stroke-opacity='.09' stroke-width='1'/%3E%3C/svg%3E");}
+.n-sheen{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 90% 70% at 50% 0%,rgba(255,255,255,.22),transparent 60%),radial-gradient(ellipse 50% 60% at 100% 100%,rgba(0,0,40,.25),transparent 60%),linear-gradient(115deg,transparent 30%,rgba(255,255,255,.07) 45%,transparent 60%);}
+.n-lines{position:absolute;inset:0;pointer-events:none;opacity:.35;background:repeating-linear-gradient(180deg,transparent 0 3px,rgba(0,0,40,.12) 3px 4px);}
+.n-stars{position:absolute;inset:0;pointer-events:none;opacity:.55;}
+.n-stars circle{fill:#fff;} .n-stars path{stroke:rgba(255,255,255,.35);stroke-width:.7;fill:none;}
+.n-ticks{position:absolute;top:18px;bottom:18px;width:5px;pointer-events:none;opacity:.35;background:repeating-linear-gradient(180deg,#fff 0 1px,transparent 1px 8px);}
+.n-ticks.l{left:14px;} .n-ticks.r{right:14px;}
+.notif-body{padding:30px 60px 34px;position:relative;text-align:center;z-index:3;}
+.corner-tl,.corner-tr,.corner-bl,.corner-br{position:absolute;width:24px;height:24px;filter:drop-shadow(0 0 4px var(--t-glow));animation:corner-breathe 4s ease-in-out infinite;}
+.corner-tl{top:8px;left:16px;border-top:2px solid var(--t-corner);border-left:2px solid var(--t-corner);}
+.corner-tr{top:8px;right:16px;border-top:2px solid var(--t-corner);border-right:2px solid var(--t-corner);}
+.corner-bl{bottom:8px;left:16px;border-bottom:2px solid var(--t-corner);border-left:2px solid var(--t-corner);}
+.corner-br{bottom:8px;right:16px;border-bottom:2px solid var(--t-corner);border-right:2px solid var(--t-corner);}
+@keyframes corner-breathe{0%,100%{opacity:1}50%{opacity:.6}}
+.h-line{height:2px;margin:12px 0;background:linear-gradient(90deg,transparent 0%,var(--t-hline) 15%,var(--t-hcenter) 50%,var(--t-hline) 85%,transparent 100%);position:relative;}
+.h-line::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(45deg);width:7px;height:7px;background:#fff;box-shadow:0 0 12px var(--t-glow),0 0 3px #fff;}
+.h-line::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:22px;height:22px;border:1px solid var(--t-hcenter);border-radius:50%;opacity:.45;}
+.notif-text{font-family:'Orbitron',monospace;font-size:21px;font-weight:700;color:#ffffff;letter-spacing:.05em;line-height:1.5;text-transform:uppercase;text-shadow:0 0 22px var(--t-glow),0 0 2px rgba(255,255,255,.6),0 2px 6px rgba(0,0,80,.7);padding:6px 0;}
+.notif-text.font-system{font-family:'Orbitron',monospace;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
+.notif-text.font-cosmic{font-family:'Cinzel',serif;font-weight:600;letter-spacing:.02em;text-transform:none;}
+.notif-text.font-classic{font-family:'Crimson Text',Georgia,serif;font-weight:600;letter-spacing:.01em;text-transform:none;}
+.notif-text.font-mono{font-family:'Share Tech Mono',monospace;font-weight:400;letter-spacing:.02em;text-transform:none;}
+.notif-text.font-impact{font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
+.scan{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--t-scan),#ffffffcc,var(--t-scan),transparent);animation:scan 3.5s linear infinite;pointer-events:none;z-index:4;}
+@keyframes scan{0%{top:30px;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:calc(100% - 30px);opacity:0}}
+.empty-state{font-family:'Share Tech Mono',monospace;font-size:9px;color:#26305a;letter-spacing:.2em;text-align:center;padding:46px 20px;border:1px dashed var(--border2);border-radius:6px;background:#04060d;position:relative;}
+.empty-state::before{content:'◈';display:block;font-size:22px;color:#1c2a52;margin-bottom:10px;}
+
+/* ── CATÉGORIES ── */
+.cats-block{overflow:hidden;}
+.cats-header{background:#04060d;border-bottom:1px solid var(--border);padding:9px 14px;display:flex;align-items:center;gap:8px;}
+.cats-title{font-family:'Cinzel',serif;font-size:11.5px;font-weight:700;letter-spacing:.2em;color:var(--gold);}
+.cats-sub{font-family:'Share Tech Mono',monospace;font-size:7.5px;color:var(--text3);letter-spacing:.1em;margin-left:auto;}
+.cats-body{padding:4px 0;}
+.cat-section{border-bottom:1px solid var(--border);}
+.cat-section:last-child{border-bottom:none;}
+.cat-header{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;cursor:pointer;background:transparent;border:none;width:100%;transition:background .15s;user-select:none;}
+.cat-header:hover{background:#ffffff06;}
+.cat-header-left{display:flex;align-items:center;gap:9px;}
+.cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.cat-name{font-family:'Cinzel',serif;font-size:13px;font-weight:700;letter-spacing:.04em;color:#ffffff;}
+.cat-count{font-family:'Share Tech Mono',monospace;font-size:8.5px;color:#7080b0;letter-spacing:.08em;}
+.cat-arrow{font-family:'Share Tech Mono',monospace;font-size:9px;color:#5060a0;transition:transform .2s;}
+.cat-arrow.open{transform:rotate(90deg);}
+.cat-body{display:none;background:#030310;border-top:1px solid var(--border);}
+.cat-body.open{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#0a0e22;}
+.pbtn{padding:11px 14px;background:#05071a;cursor:pointer;transition:background .15s,box-shadow .15s;border:none;text-align:left;position:relative;}
+.pbtn::before{content:'›';position:absolute;left:5px;top:50%;transform:translateY(-50%);color:#38e0ff;opacity:0;transition:.15s;font-family:'Share Tech Mono',monospace;}
+.pbtn:hover{background:#0b1030;box-shadow:inset 2px 0 0 #38e0ff;}
+.pbtn:hover::before{opacity:1;}
+.pbtn-txt{font-family:'Crimson Text',Georgia,serif;font-size:13.5px;color:#eaf0ff;letter-spacing:.01em;line-height:1.5;}
+
+/* ── MODALS ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(3px);}
+.modal-overlay.open{display:flex;}
+.modal{background:linear-gradient(170deg,#0a0e1c,#060812);border:1px solid var(--border2);border-radius:4px;padding:24px;width:380px;display:flex;flex-direction:column;gap:14px;box-shadow:0 12px 50px #00000099;position:relative;}
+.modal::before{content:'';position:absolute;top:0;left:24px;right:24px;height:1px;background:linear-gradient(90deg,transparent,#38e0ff66,transparent);}
+.modal-title{font-family:'Cinzel',serif;font-size:15px;font-weight:700;letter-spacing:.08em;color:var(--gold);}
+.modal-field{display:flex;flex-direction:column;gap:5px;}
+.modal-field label{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:9.5px;color:#5a7aa8;letter-spacing:.16em;text-transform:uppercase;}
+.modal-field input,.modal-field select{background:#02040a;border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:'Orbitron',monospace;font-size:10px;padding:8px 10px;outline:none;width:100%;transition:border-color .2s;}
+.modal-field input:focus,.modal-field select:focus{border-color:#38e0ff66;}
+.modal-field select option{background:#080812;}
+.modal-btns{display:flex;gap:8px;}
+.modal-btn{flex:1;padding:9px;border-radius:3px;font-family:'Cinzel',serif;font-size:12px;font-weight:700;letter-spacing:.1em;cursor:pointer;transition:all .15s;background:transparent;text-transform:uppercase;border:1px solid;}
+.modal-btn-ok{color:#60d080;border-color:#60d08066;}
+.modal-btn-ok:hover{background:#60d08022;}
+.modal-btn-cancel{color:var(--text3);border-color:var(--border2);}
+.modal-btn-cancel:hover{background:#ffffff06;}
+
+/* ── THÈMES CSS ── */
+body.theme-rouge{--t-bar1:#8a0e0e;--t-bar2:#aa1414;--t-bar3:#c01818;--t-main1:#c01818;--t-main2:#d42020;--t-main3:#e83030;--t-glow:rgba(255,100,100,.95);--t-border:rgba(255,60,60,.4);--t-corner:rgba(255,160,160,.8);--t-side:#ff7070;--t-hline:rgba(255,140,140,.6);--t-hcenter:rgba(255,220,220,.98);--t-card-border:#ff4040aa;--t-card-border2:#cc0a0a44;--t-card-inset:#ff707088;--t-botbar-txt:rgba(255,160,160,.45);--t-scan:rgba(255,200,200,.4);--t-deco:rgba(255,180,180,.55);}
+body.theme-cramoisi{--t-bar1:#4a0000;--t-bar2:#660000;--t-bar3:#7a0010;--t-main1:#7a0010;--t-main2:#920018;--t-main3:#aa0020;--t-glow:rgba(255,30,60,1);--t-border:rgba(220,0,40,.5);--t-corner:rgba(255,80,100,.9);--t-side:#ff1a40;--t-hline:rgba(255,60,80,.7);--t-hcenter:rgba(255,200,210,1);--t-card-border:#ff003388;--t-card-border2:#88000066;--t-card-inset:#ff003366;--t-botbar-txt:rgba(255,100,120,.5);--t-scan:rgba(255,80,100,.5);--t-deco:rgba(255,60,80,.65);}
+body.theme-orange-alerte{--t-bar1:#5a1a00;--t-bar2:#7a2600;--t-bar3:#963000;--t-main1:#963000;--t-main2:#b83c00;--t-main3:#d84800;--t-glow:rgba(255,130,0,1);--t-border:rgba(240,100,0,.45);--t-corner:rgba(255,190,80,.9);--t-side:#ff8800;--t-hline:rgba(255,160,40,.65);--t-hcenter:rgba(255,240,180,1);--t-card-border:#ff7700aa;--t-card-border2:#993300;--t-card-inset:#ffaa0066;--t-botbar-txt:rgba(255,180,60,.5);--t-scan:rgba(255,200,80,.45);--t-deco:rgba(255,180,50,.6);}
+body.theme-orange{--t-bar1:#7a2e00;--t-bar2:#9a3e00;--t-bar3:#b04800;--t-main1:#b04800;--t-main2:#cc5800;--t-main3:#e86800;--t-glow:rgba(255,160,60,.9);--t-border:rgba(220,120,40,.35);--t-corner:rgba(255,200,140,.75);--t-side:#ff9840;--t-hline:rgba(255,180,100,.55);--t-hcenter:rgba(255,240,210,.95);--t-card-border:#ee8020aa;--t-card-border2:#aa4a0044;--t-card-inset:#ffaa5088;--t-botbar-txt:rgba(255,200,130,.4);--t-scan:rgba(255,230,180,.35);--t-deco:rgba(255,210,150,.5);}
+body.theme-jaune{--t-bar1:#7a5e00;--t-bar2:#9a7800;--t-bar3:#b08800;--t-main1:#b08800;--t-main2:#cc9e00;--t-main3:#e8b800;--t-glow:rgba(255,220,60,.95);--t-border:rgba(220,180,40,.4);--t-corner:rgba(255,240,140,.85);--t-side:#ffd840;--t-hline:rgba(255,230,80,.65);--t-hcenter:rgba(255,252,200,1);--t-card-border:#eec020aa;--t-card-border2:#aa880044;--t-card-inset:#ffdd6088;--t-botbar-txt:rgba(255,230,100,.45);--t-scan:rgba(255,245,150,.4);--t-deco:rgba(255,240,120,.55);}
+body.theme-vert{--t-bar1:#0a5e1e;--t-bar2:#0e7a28;--t-bar3:#128a2c;--t-main1:#148a30;--t-main2:#189e38;--t-main3:#22b844;--t-glow:rgba(80,255,120,.9);--t-border:rgba(40,200,70,.38);--t-corner:rgba(140,255,170,.8);--t-side:#50e870;--t-hline:rgba(120,240,150,.6);--t-hcenter:rgba(210,255,225,.98);--t-card-border:#30c050aa;--t-card-border2:#0a7a2044;--t-card-inset:#70ee9088;--t-botbar-txt:rgba(140,255,170,.45);--t-scan:rgba(180,255,200,.38);--t-deco:rgba(140,255,170,.55);}
+body.theme-toxique{--t-bar1:#003a00;--t-bar2:#005500;--t-bar3:#006600;--t-main1:#006600;--t-main2:#008800;--t-main3:#00aa00;--t-glow:rgba(0,255,60,1);--t-border:rgba(0,220,50,.5);--t-corner:rgba(100,255,120,.95);--t-side:#00ff44;--t-hline:rgba(60,255,100,.7);--t-hcenter:rgba(200,255,210,1);--t-card-border:#00ee4488;--t-card-border2:#008800;--t-card-inset:#00ff4466;--t-botbar-txt:rgba(80,255,110,.5);--t-scan:rgba(100,255,130,.5);--t-deco:rgba(60,255,90,.65);}
+body.theme-cyan{--t-bar1:#006a7a;--t-bar2:#008898;--t-bar3:#00a0b0;--t-main1:#00a0b0;--t-main2:#00b8cc;--t-main3:#00d4e8;--t-glow:rgba(0,230,255,.95);--t-border:rgba(0,200,220,.4);--t-corner:rgba(120,245,255,.85);--t-side:#00eeff;--t-hline:rgba(80,240,255,.6);--t-hcenter:rgba(210,252,255,.98);--t-card-border:#00d8ffaa;--t-card-border2:#008aaa44;--t-card-inset:#80f0ff88;--t-botbar-txt:rgba(120,240,255,.45);--t-scan:rgba(180,250,255,.4);--t-deco:rgba(140,248,255,.55);}
+body.theme-bleu{--t-bar1:#0e50aa;--t-bar2:#1462be;--t-bar3:#1868c8;--t-main1:#1868d4;--t-main2:#1e7ae8;--t-main3:#2888f8;--t-glow:rgba(120,210,255,.85);--t-border:rgba(80,160,255,.35);--t-corner:rgba(160,230,255,.75);--t-side:#70c0ff;--t-hline:rgba(160,230,255,.55);--t-hcenter:rgba(220,248,255,.95);--t-card-border:#60a8ffaa;--t-card-border2:#1a6ad844;--t-card-inset:#80c0ff88;--t-botbar-txt:rgba(150,200,255,.4);--t-scan:rgba(200,240,255,.35);--t-deco:rgba(150,220,255,.5);}
+body.theme-bleu-roi{--t-bar1:#060a30;--t-bar2:#0a1048;--t-bar3:#0e1460;--t-main1:#0e1460;--t-main2:#141c80;--t-main3:#1a24a0;--t-glow:rgba(80,100,255,1);--t-border:rgba(60,80,255,.5);--t-corner:rgba(140,160,255,.9);--t-side:#4060ff;--t-hline:rgba(100,120,255,.7);--t-hcenter:rgba(200,210,255,1);--t-card-border:#3050ffaa;--t-card-border2:#081066;--t-card-inset:#5070ff66;--t-botbar-txt:rgba(140,160,255,.5);--t-scan:rgba(160,180,255,.5);--t-deco:rgba(120,140,255,.65);}
+body.theme-violet{--t-bar1:#0e0030;--t-bar2:#160048;--t-bar3:#1e0060;--t-main1:#1e0060;--t-main2:#2a0080;--t-main3:#3800a8;--t-glow:rgba(180,80,255,1);--t-border:rgba(140,40,255,.5);--t-corner:rgba(210,140,255,.9);--t-side:#c060ff;--t-hline:rgba(180,80,255,.7);--t-hcenter:rgba(240,200,255,1);--t-card-border:#9930ffaa;--t-card-border2:#500090;--t-card-inset:#c060ff66;--t-botbar-txt:rgba(190,120,255,.5);--t-scan:rgba(210,140,255,.5);--t-deco:rgba(200,120,255,.65);}
+body.theme-violet-doux{--t-bar1:#2a0e6a;--t-bar2:#3a1488;--t-bar3:#4818a0;--t-main1:#4818a0;--t-main2:#5820b8;--t-main3:#6c30d0;--t-glow:rgba(190,110,255,.88);--t-border:rgba(150,70,255,.38);--t-corner:rgba(215,170,255,.78);--t-side:#c080ff;--t-hline:rgba(195,135,255,.58);--t-hcenter:rgba(238,218,255,.95);--t-card-border:#a058ffaa;--t-card-border2:#601acc44;--t-card-inset:#c480ff88;--t-botbar-txt:rgba(205,165,255,.42);--t-scan:rgba(225,195,255,.38);--t-deco:rgba(215,175,255,.52);}
+body.theme-rose{--t-bar1:#8a0e5e;--t-bar2:#aa147a;--t-bar3:#c0188a;--t-main1:#c0188a;--t-main2:#d820a0;--t-main3:#ee30b8;--t-glow:rgba(255,80,210,.9);--t-border:rgba(255,60,190,.4);--t-corner:rgba(255,160,235,.82);--t-side:#ff60e0;--t-hline:rgba(255,120,230,.62);--t-hcenter:rgba(255,220,248,.98);--t-card-border:#ff40c0aa;--t-card-border2:#aa1a7844;--t-card-inset:#ff70e088;--t-botbar-txt:rgba(255,160,235,.45);--t-scan:rgba(255,200,245,.38);--t-deco:rgba(255,170,238,.55);}
+body.theme-turquoise{--t-bar1:#004a3a;--t-bar2:#006050;--t-bar3:#007862;--t-main1:#007862;--t-main2:#009278;--t-main3:#00aa8c;--t-glow:rgba(0,220,180,.95);--t-border:rgba(0,190,160,.42);--t-corner:rgba(100,240,220,.85);--t-side:#00ddb8;--t-hline:rgba(60,230,200,.62);--t-hcenter:rgba(200,255,248,.98);--t-card-border:#00c8a0aa;--t-card-border2:#007a5844;--t-card-inset:#00e0c088;--t-botbar-txt:rgba(100,240,215,.44);--t-scan:rgba(160,245,230,.38);--t-deco:rgba(120,240,218,.55);}
+body.theme-or{--t-bar1:#3a2800;--t-bar2:#584000;--t-bar3:#705200;--t-main1:#705200;--t-main2:#906800;--t-main3:#b08000;--t-glow:rgba(255,200,0,1);--t-border:rgba(230,170,0,.48);--t-corner:rgba(255,230,80,.92);--t-side:#ffcc00;--t-hline:rgba(255,210,40,.68);--t-hcenter:rgba(255,252,180,1);--t-card-border:#ddaa00aa;--t-card-border2:#886600;--t-card-inset:#ffcc0066;--t-botbar-txt:rgba(255,210,60,.5);--t-scan:rgba(255,230,80,.48);--t-deco:rgba(255,220,50,.65);}
+body.theme-blanc{--t-bar1:#4a4a5a;--t-bar2:#606070;--t-bar3:#707080;--t-main1:#707080;--t-main2:#888898;--t-main3:#a0a0b0;--t-glow:rgba(255,255,255,.95);--t-border:rgba(220,220,240,.42);--t-corner:rgba(255,255,255,.92);--t-side:#ffffff;--t-hline:rgba(240,240,255,.62);--t-hcenter:rgba(255,255,255,1);--t-card-border:#ffffffaa;--t-card-border2:#aaaacc44;--t-card-inset:#ffffff88;--t-botbar-txt:rgba(240,240,255,.5);--t-scan:rgba(255,255,255,.42);--t-deco:rgba(255,255,255,.62);}
+body.theme-noir{--t-bar1:#080808;--t-bar2:#101010;--t-bar3:#181818;--t-main1:#101010;--t-main2:#181818;--t-main3:#202020;--t-glow:rgba(180,180,200,.55);--t-border:rgba(80,80,100,.28);--t-corner:rgba(160,160,180,.55);--t-side:#707070;--t-hline:rgba(140,140,160,.38);--t-hcenter:rgba(210,210,220,.75);--t-card-border:#606070aa;--t-card-border2:#22222844;--t-card-inset:#60606066;--t-botbar-txt:rgba(130,130,150,.38);--t-scan:rgba(170,170,190,.18);--t-deco:rgba(150,150,170,.38);}
+body.theme-sang{--t-bar1:#1a0000;--t-bar2:#280000;--t-bar3:#360004;--t-main1:#360004;--t-main2:#480008;--t-main3:#5a000c;--t-glow:rgba(200,0,20,1);--t-border:rgba(180,0,20,.6);--t-corner:rgba(255,40,60,.8);--t-side:#cc0010;--t-hline:rgba(200,20,40,.7);--t-hcenter:rgba(255,160,170,1);--t-card-border:#aa001488;--t-card-border2:#660000;--t-card-inset:#cc001044;--t-botbar-txt:rgba(200,60,70,.5);--t-scan:rgba(220,80,90,.4);--t-deco:rgba(200,40,50,.6);}
+body.theme-emeraude{--t-bar1:#002a18;--t-bar2:#003a22;--t-bar3:#004a2c;--t-main1:#004a2c;--t-main2:#005c38;--t-main3:#007048;--t-glow:rgba(0,220,120,1);--t-border:rgba(0,200,100,.5);--t-corner:rgba(80,255,180,.9);--t-side:#00e888;--t-hline:rgba(40,240,150,.7);--t-hcenter:rgba(180,255,230,1);--t-card-border:#00cc7888;--t-card-border2:#006644;--t-card-inset:#00ee8866;--t-botbar-txt:rgba(80,255,170,.5);--t-scan:rgba(120,255,190,.5);--t-deco:rgba(60,240,160,.65);}
+body.theme-acier{--t-bar1:#101418;--t-bar2:#181e24;--t-bar3:#202830;--t-main1:#202830;--t-main2:#2a3440;--t-main3:#344050;--t-glow:rgba(160,200,220,.7);--t-border:rgba(120,160,180,.35);--t-corner:rgba(180,210,230,.7);--t-side:#90b8cc;--t-hline:rgba(150,190,210,.5);--t-hcenter:rgba(220,240,250,.9);--t-card-border:#80a8c0aa;--t-card-border2:#304050;--t-card-inset:#90b8cc66;--t-botbar-txt:rgba(150,190,210,.4);--t-scan:rgba(180,215,230,.35);--t-deco:rgba(160,200,220,.5);}
+body.theme-plasma{--t-bar1:#1a0028;--t-bar2:#280040;--t-bar3:#340058;--t-main1:#340058;--t-main2:#440070;--t-main3:#580090;--t-glow:rgba(200,0,255,1);--t-border:rgba(180,0,240,.5);--t-corner:rgba(240,100,255,.9);--t-side:#cc00ee;--t-hline:rgba(220,60,255,.7);--t-hcenter:rgba(250,180,255,1);--t-card-border:#bb00dd88;--t-card-border2:#660088;--t-card-inset:#cc00ee55;--t-botbar-txt:rgba(220,100,255,.5);--t-scan:rgba(230,120,255,.5);--t-deco:rgba(220,80,255,.65);}
+body.theme-nebula{--t-bar1:#080418;--t-bar2:#100828;--t-bar3:#180c38;--t-main1:#180c38;--t-main2:#241050;--t-main3:#301468;--t-glow:rgba(120,80,255,.9);--t-border:rgba(100,60,220,.4);--t-corner:rgba(180,150,255,.8);--t-side:#9060ee;--t-hline:rgba(150,110,240,.6);--t-hcenter:rgba(220,200,255,.95);--t-card-border:#8050ddaa;--t-card-border2:#40206688;--t-card-inset:#a070ee88;--t-botbar-txt:rgba(170,140,255,.42);--t-scan:rgba(190,160,255,.38);--t-deco:rgba(170,130,245,.55);}
+
+/* ── ajouts Notifications Manhwa ── */
+body{padding:16px 14px 50px;}
+.app-layout{max-width:1400px;grid-template-columns:320px 1fr;}
+.left-panel{position:static;}
+.mini-lbl{display:flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:7.5px;letter-spacing:.14em;color:var(--text3);text-transform:uppercase;}
+.mini-lbl input[type=color]{width:26px;height:22px;border:1px solid var(--border2);background:#02040a;border-radius:2px;padding:1px;cursor:pointer;}
+.preset-body{padding:10px 12px 12px;display:flex;flex-direction:column;gap:8px;}
+.preset-list{display:flex;flex-direction:column;gap:4px;max-height:220px;overflow-y:auto;scrollbar-width:thin;}
+.preset-item{display:flex;align-items:center;gap:6px;padding:5px 8px;border:1px solid var(--border);border-radius:2px;background:#04060d;cursor:pointer;transition:.15s;}
+.preset-item:hover{border-color:#38e0ff55;background:#38e0ff0a;}
+.preset-item .pn{flex:1;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.06em;color:var(--text);}
+.preset-item .ps{font-family:'Share Tech Mono',monospace;font-size:6.5px;color:var(--text3);letter-spacing:.1em;}
+.preset-item .pdot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.preset-item .pdel{font-size:9px;color:var(--text3);background:transparent;border:none;cursor:pointer;opacity:.5;padding:2px 4px;}
+.preset-item .pdel:hover{color:#ff4455;opacity:1;}
+.preset-row{display:flex;gap:6px;}
+.preset-row input{flex:1;background:#02040a;border:1px solid var(--border2);border-radius:2px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:9.5px;padding:6px 9px;outline:none;}
+.ctrl-hint{font-family:'Share Tech Mono',monospace;font-size:7.5px;color:var(--text3);letter-spacing:.08em;line-height:1.6;}
+.cast-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:12px;}
+.cast-sec{display:flex;flex-direction:column;gap:6px;}
+.cast-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 12px;}
+@media(max-width:1100px){.cast-grid{grid-template-columns:repeat(2,1fr);}}
+.cast-grid .ctrl-group{min-width:0;}
+.ctrl-group input[type=number]{background:#02040a;border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:'Orbitron',monospace;font-size:10px;padding:8px 11px;outline:none;width:100%;}
+.ctrl-group input[type=range]{width:100%;accent-color:#38e0ff;}
+.inline{display:flex;gap:6px;align-items:center;}
+.inline > *{min-width:0;}
+.inline input[type=number]{width:90px;flex:0 0 90px;}
+.chk{display:flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:8.5px;letter-spacing:.08em;color:var(--text2);cursor:pointer;padding:8px 0;}
+.chk input{accent-color:#38e0ff;width:13px;height:13px;margin:0;}
+.target-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.tg-sep{width:1px;height:18px;background:var(--border2);}
+.tg-btn{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.08em;padding:6px 11px;border-radius:3px;border:1px solid #2a3c6a;background:rgba(40,60,120,.14);color:#a8bce6;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;}
+.tg-btn:hover{color:#fff;border-color:#6a8ad8;}
+.tg-btn.active{color:#fff;border-color:var(--uc,#38e0ff);background:color-mix(in srgb,var(--uc,#38e0ff) 22%,#000);box-shadow:0 0 10px -2px var(--uc,#38e0ff);}
+.tg-btn.tg-all.active{color:#1a1208;border-color:var(--gold);background:linear-gradient(180deg,#ffe6a8,var(--gold));font-weight:700;}
+.tg-btn.off{opacity:.45;}
+.tg-btn .udot{width:7px;height:7px;border-radius:50%;background:var(--uc,#38e0ff);box-shadow:0 0 5px var(--uc,#38e0ff);}
+.tg-btn.off .udot{background:#444;box-shadow:none;}
+.tg-btn.gm .udot{border-radius:1px;}
+.tg-tool{border-style:dashed;}
+.cast-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.btn-cast{font-family:'Cinzel',serif;font-size:15px;font-weight:700;letter-spacing:.22em;padding:12px 34px;border-radius:3px;border:1px solid var(--gold);color:#1a1208;background:linear-gradient(180deg,#ffe6a8,var(--gold));cursor:pointer;transition:all .18s;box-shadow:0 0 22px -4px var(--gold);}
+.btn-cast:hover{box-shadow:0 0 30px -2px var(--gold);transform:translateY(-1px);}
+.btn-cast:disabled{opacity:.4;cursor:default;transform:none;}
+.cast-export{display:flex;gap:5px;margin-left:auto;align-items:center;}
+.cast-export select{background:#02040a;border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:'Orbitron',monospace;font-size:9px;padding:7px 9px;outline:none;}
+.btn-export{font-size:10px;height:32px;padding:6px 12px;}
+.lib-search{background:#020308;border:1px solid var(--border);border-radius:2px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:9px;padding:5px 8px;outline:none;width:180px;margin-left:12px;}
+.pbtn-del{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:var(--text3);font-size:9px;cursor:pointer;opacity:0;transition:.15s;}
+.pbtn:hover .pbtn-del{opacity:.7;} .pbtn-del:hover{color:#ff4455;opacity:1 !important;}
+.hist-body{padding:4px 0;max-height:360px;overflow-y:auto;scrollbar-width:thin;}
+.hist-row{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--border);}
+.hist-row:hover{background:#ffffff05;}
+.hist-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+.hist-txt{flex:1;font-family:'Crimson Text',Georgia,serif;font-size:13px;color:#eaf0ff;line-height:1.4;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hist-meta{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--text3);letter-spacing:.1em;white-space:nowrap;}
+.hist-row .reg-btn{flex-shrink:0;}
+.notif-card .nm-img{display:block;max-width:100%;max-height:340px;margin:0 auto 10px;border-radius:4px;box-shadow:0 0 18px -4px var(--t-glow);}
+.notif-topbar-txt span{white-space:nowrap;}
+#cast-hint{min-height:12px;}
+.flash{animation:flash .6s ease-out;}
+@keyframes flash{0%{box-shadow:0 0 0 0 #ffd070aa;}100%{box-shadow:0 0 0 18px transparent;}}
+#tg-users{display:contents;}
+.inline .reg-btn{flex-shrink:0;}
+
+/* ══════════ v1.1 — mise en page compacte ══════════ */
+body{padding:10px 12px 40px;}
+.app-header.compact{margin-bottom:10px;} .app-header.compact .app-title{font-size:22px;} .app-header.compact .app-sub{font-size:7.5px;}
+.app-layout.v2{max-width:1340px;grid-template-columns:272px 1fr;gap:12px;}
+@media(max-width:1000px){.app-layout.v2{grid-template-columns:1fr;}}
+.v2 .left-panel{position:sticky;top:10px;}
+.v2 .reg-body{max-height:calc(100vh - 150px);}
+.v2 .registry-header{padding:7px 10px;gap:6px;} .v2 .registry-title{font-size:10.5px;}
+.v2 .right-panel{gap:10px;}
+.v2 .controls{padding:10px 12px 10px;gap:8px;}
+.v2 .ctrl-top{display:flex;gap:10px;align-items:center;} .v2 .ctrl-top .ctrl-lbl{flex:0 0 auto;margin:0;}
+.v2 .mode-row{gap:4px;} .v2 .mode-btn{font-size:9px;padding:5px 9px;}
+.v2 .ctrl-row.tight{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;}
+.v2 .ctrl-lbl{font-size:7.5px;margin-bottom:3px;}
+.v2 .ctrl-group input[type=text],.v2 .ctrl-group select,.v2 .ctrl-group textarea{padding:7px 9px;font-size:10px;}
+.v2 textarea#inp-full{min-height:64px;}
+.v2 .mk-toolbar{margin-top:5px;}
+/* scène : carte + couleur + diffuser, serrés */
+.stage{display:flex;flex-direction:column;gap:8px;}
+.stage .notif-wrap{margin:0 auto;width:100%;}
+.theme-strip{display:flex;align-items:center;gap:10px;padding:7px 12px;flex-wrap:wrap;}
+.theme-strip .theme-label{margin:0;flex:0 0 auto;font-size:7.5px;}
+.theme-strip .theme-groups{flex-direction:row;flex-wrap:wrap;gap:4px 10px;flex:1;}
+.theme-strip .theme-group{display:flex;align-items:center;gap:5px;} .theme-strip .theme-group-lbl{display:none;}
+.theme-strip .theme-row{gap:4px;} .theme-strip .theme-btn{width:20px;height:20px;}
+.theme-strip .theme-row.custom{margin-left:auto;align-items:center;gap:8px;padding-left:10px;border-left:1px solid var(--border2);}
+.cast-bar{padding:8px 12px 8px;display:flex;flex-direction:column;gap:8px;}
+.cast-bar .target-row{gap:5px;} .cast-bar .tg-btn{font-size:8.5px;padding:5px 9px;} .cast-bar .chk{padding:0;}
+.cast-bar .win-sys{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:.2em;color:var(--text3);}
+.cast-bar .cast-actions{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;}
+.cast-bar .btn-cast{font-size:16px;padding:12px 44px;justify-self:center;}
+.btn-save{justify-self:start;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.1em;padding:9px 12px;border-radius:3px;border:1px solid #2a3c6a;background:rgba(40,60,120,.14);color:#cfe0ff;cursor:pointer;transition:.15s;}
+.btn-save:hover{border-color:var(--gold);color:#fff;box-shadow:0 0 12px -4px var(--gold);}
+.cast-bar .cast-export{justify-self:end;margin-left:0;}
+#cast-hint{min-height:10px;text-align:center;}
+/* onglets */
+.tabs-block{overflow:hidden;}
+.tabs-bar{display:flex;align-items:center;gap:2px;padding:6px 8px 0;background:#04060d;border-bottom:1px solid var(--border);}
+.tab-btn{font-family:'Cinzel',serif;font-size:10.5px;font-weight:700;letter-spacing:.12em;padding:9px 14px;border:1px solid transparent;border-bottom:none;border-radius:4px 4px 0 0;background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;gap:7px;transition:.15s;}
+.tab-btn:hover{color:var(--text);} .tab-btn.active{color:var(--gold);background:linear-gradient(180deg,#0e1424,#0a0e1c);border-color:var(--border2);box-shadow:0 -2px 0 var(--gold) inset;}
+.tab-n{font-family:'Share Tech Mono',monospace;font-size:8px;padding:1px 6px;border-radius:9px;background:#ffffff12;color:var(--text2);}
+.tab-btn.active .tab-n{background:var(--gold);color:#1a1208;}
+.tabs-bar .lib-search{margin-left:auto;margin-right:2px;margin-bottom:4px;width:200px;}
+.tab-pane{display:none;} .tab-pane.active{display:block;}
+.tab-pane .cats-sub{padding:6px 12px;display:flex;justify-content:flex-end;font-size:7px;}
+.tab-pane .cats-body{max-height:520px;overflow-y:auto;scrollbar-width:thin;}
+.tab-pane .hist-body{max-height:520px;}
+.cast-grid.five{grid-template-columns:repeat(5,1fr);} @media(max-width:1200px){.cast-grid.five{grid-template-columns:repeat(3,1fr);}}
+.presets-row .preset-list{flex-direction:row;flex-wrap:wrap;max-height:none;} .presets-row .preset-item{flex:0 0 auto;}
+.presets-row .preset-row{max-width:420px;}
+/* mes messages */
+.saved-body{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px;padding:10px 12px;max-height:560px;overflow-y:auto;scrollbar-width:thin;}
+.saved-card{position:relative;display:flex;flex-direction:column;gap:6px;padding:10px 12px 10px 14px;border:1px solid var(--border2);border-left:4px solid var(--sc,#38e0ff);border-radius:3px;background:linear-gradient(170deg,#0b1020,#06080f);transition:.15s;}
+.saved-card:hover{border-color:var(--sc,#38e0ff);box-shadow:0 0 16px -6px var(--sc,#38e0ff);}
+.saved-card .sc-name{font-family:'Cinzel',serif;font-size:12px;font-weight:700;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:8px;}
+.saved-card .sc-name .sc-dot{width:9px;height:9px;border-radius:2px;background:var(--sc,#38e0ff);box-shadow:0 0 6px var(--sc,#38e0ff);}
+.saved-card .sc-txt{font-family:'Crimson Text',Georgia,serif;font-size:12.5px;color:#d8e0f5;line-height:1.4;max-height:54px;overflow:hidden;}
+.saved-card .sc-meta{font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:.1em;color:var(--text3);}
+.saved-card .sc-btns{display:flex;gap:5px;margin-top:2px;}
+.saved-card .sc-btns .reg-btn{padding:5px 9px;font-size:8px;}
+.saved-card .sc-cast{color:#1a1208;border-color:var(--gold);background:linear-gradient(180deg,#ffe6a8,var(--gold));font-weight:700;}
+.saved-card .sc-del{margin-left:auto;color:var(--text3);border-color:transparent;} .saved-card .sc-del:hover{color:#ff4455;}
+.saved-empty{grid-column:1/-1;padding:26px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:8.5px;letter-spacing:.14em;color:var(--text3);line-height:1.9;}
+
+</style>
+</head>
+<body class="theme-bleu">
+<canvas id="stars"></canvas>
+
+<div class="app-header compact">
+  <div class="app-title">◈ NOTIFICATIONS MANHWA ◈</div>
+  <div class="app-sub" id="app-sub">Canal des constellations · Registre · Diffusion en direct</div>
+</div>
+
+<div class="app-layout v2">
+
+  <!-- ═══ COLONNE GAUCHE : REGISTRE (compact) ═══ -->
+  <div class="left-panel">
+    <div class="registry win">
+      <div class="registry-header">
+        <div class="registry-title">✦ Registre</div>
+        <button class="reg-btn reg-btn-folder" onclick="openModalFolder()" title="Nouveau dossier">+ Dossier</button>
+        <button class="reg-btn reg-btn-new" onclick="openModalConst()" title="Nouvelle constellation">+ Const.</button>
+      </div>
+      <div class="reg-search">
+        <input type="text" id="reg-search" placeholder="Rechercher une constellation…" oninput="renderRegistry()">
+      </div>
+      <div class="reg-body" id="reg-body"></div>
+    </div>
+  </div>
+
+  <!-- ═══ COLONNE PRINCIPALE ═══ -->
+  <div class="right-panel">
+
+    <!-- 1 · COMPOSER -->
+    <div class="controls win">
+      <div class="ctrl-top">
+        <div class="ctrl-lbl">Mode émetteur</div>
+        <div class="mode-row" id="mode-row"></div>
+      </div>
+      <div class="ctrl-row tight">
+        <div class="ctrl-group" style="flex:0 0 190px" id="grp-name">
+          <div class="ctrl-lbl">Constellation</div>
+          <input type="text" id="inp-name" placeholder="Nom…" oninput="updatePreview()">
+        </div>
+        <div class="ctrl-group" style="flex:0 0 190px;display:none" id="grp-cat">
+          <div class="ctrl-lbl">Catégorie émettrice</div>
+          <select id="inp-catmode" onchange="if(currentTmpl)applyTemplate(currentTmpl)"></select>
+        </div>
+        <div class="ctrl-group" style="flex:0 0 150px">
+          <div class="ctrl-lbl">Incarnation (%I)</div>
+          <input type="text" id="inp-incarnation" placeholder="ex : Gillemium" oninput="if(currentTmpl)applyTemplate(currentTmpl)">
+        </div>
+        <div class="ctrl-group" style="flex:0 0 100px">
+          <div class="ctrl-lbl">Gold (%G)</div>
+          <input type="text" id="inp-gold" placeholder="10" oninput="if(currentTmpl)applyTemplate(currentTmpl)">
+        </div>
+        <div class="ctrl-group">
+          <div class="ctrl-lbl">Police</div>
+          <select id="inp-font" onchange="setFont(this.value)">
+            <option value="system">Système (Orbitron)</option>
+            <option value="cosmic">Cosmique (Cinzel)</option>
+            <option value="classic">Classique (Crimson)</option>
+            <option value="mono">Console (Share Tech Mono)</option>
+            <option value="impact">Impact (Rajdhani)</option>
+          </select>
+        </div>
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-lbl">Message · balises {or} {sang} {cyan} … {/} · Entrée = à la ligne</div>
+        <textarea id="inp-full" rows="3" placeholder="Le message apparaîtra ici…" oninput="updatePreviewFull()"></textarea>
+        <div class="mk-toolbar">
+          <button type="button" class="mk-btn" onclick="mkInsertLine()" title="Insérer un retour à la ligne">À la ligne</button>
+          <span class="mk-sep"></span>
+          <button type="button" class="mk-dot" style="--mc:#ffd700" onclick="mkWrap('or')" title="Doré"></button>
+          <button type="button" class="mk-dot" style="--mc:#ff2233" onclick="mkWrap('sang')" title="Rouge sang"></button>
+          <button type="button" class="mk-dot" style="--mc:#00e8ff" onclick="mkWrap('cyan')" title="Cyan"></button>
+          <button type="button" class="mk-dot" style="--mc:#c07aff" onclick="mkWrap('violet')" title="Violet"></button>
+          <button type="button" class="mk-dot" style="--mc:#4dff88" onclick="mkWrap('vert')" title="Vert"></button>
+          <button type="button" class="mk-dot" style="--mc:#4d9dff" onclick="mkWrap('bleu')" title="Bleu"></button>
+          <button type="button" class="mk-dot" style="--mc:#ff6ec7" onclick="mkWrap('rose')" title="Rose"></button>
+          <button type="button" class="mk-dot" style="--mc:#e8eef8" onclick="mkWrap('argent')" title="Argent"></button>
+          <span class="mk-sep"></span>
+          <button type="button" class="mk-btn" onclick="clearMessage()" title="Vider">Vider</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 · APERÇU + COULEUR + DIFFUSER -->
+    <div class="stage">
+      <div class="notif-wrap">
+        <div class="empty-state" id="empty">SÉLECTIONNEZ UN MODE · CHOISISSEZ UNE CONSTELLATION · CLIQUEZ SUR UN EXEMPLE</div>
+        <div class="notif-card" id="card" style="display:none">
+          <div class="notif-topbar">
+            <div class="notif-topbar-deco"><div class="deco-corner"></div><div class="deco-corner2"></div></div>
+            <div class="notif-topbar-txt"><i></i><span id="p-top">SYS::CONSTELLATION_LINK</span></div>
+            <div class="notif-cat" id="notif-cat"></div>
+            <div class="win-btn">—</div><div class="win-btn">□</div><div class="win-btn">✕</div>
+          </div>
+          <div class="notif-main">
+            <div class="n-hex"></div><div class="n-sheen"></div><div class="n-lines"></div>
+            <svg class="n-stars" id="n-stars" viewBox="0 0 1000 260" preserveAspectRatio="none"></svg>
+            <div class="n-ticks l"></div><div class="n-ticks r"></div>
+            <div class="scan"></div>
+            <div class="notif-body">
+              <div class="corner-tl"></div><div class="corner-tr"></div>
+              <div class="corner-bl"></div><div class="corner-br"></div>
+              <div class="h-line"></div>
+              <img class="nm-img" id="p-img" style="display:none" alt="">
+              <div class="notif-text" id="txt"></div>
+              <div class="h-line"></div>
+            </div>
+          </div>
+          <div class="notif-botbar">
+            <div class="notif-botbar-left"><i></i><i></i><i></i><i></i></div>
+            <div class="notif-botbar-txt" id="p-bot">CONSTELLATION.NETWORK · NOTIFICATION.SYS</div>
+            <div class="notif-botbar-deco"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- couleur de fenêtre : bande horizontale sous l'aperçu -->
+      <div class="theme-strip win">
+        <div class="theme-label">Couleur</div>
+        <div class="theme-groups" id="theme-groups"></div>
+        <div class="theme-row custom">
+          <button class="theme-btn" id="tbtn-custom" title="Personnalisée" onclick="setTheme('custom')" style="background:linear-gradient(135deg,#ff4040,#40ff90,#4080ff)"></button>
+          <label class="mini-lbl">Fond <input type="color" id="c-main" value="#1e7ae8" oninput="onCustomColor()"></label>
+          <label class="mini-lbl">Lueur <input type="color" id="c-glow" value="#8ad4ff" oninput="onCustomColor()"></label>
+        </div>
+      </div>
+
+      <!-- destinataires + DIFFUSER, collés à la carte -->
+      <div class="cast-bar win">
+        <div class="target-row" id="target-row">
+          <button class="tg-btn tg-all active" id="tg-all" onclick="setAllTargets(true)">Tous les joueurs</button>
+          <span class="tg-sep"></span>
+          <span id="tg-users"></span>
+          <button class="tg-btn tg-tool" onclick="askTokenOwners()" title="Cocher les propriétaires des tokens sélectionnés sur la scène">Tokens sélectionnés</button>
+          <label class="chk"><input type="checkbox" id="opt-gmtoo" checked> Aussi chez moi</label>
+          <span class="win-sys" id="cast-sys">CANAL OUVERT</span>
+        </div>
+        <div class="cast-actions">
+          <button class="btn-save" onclick="saveMessage()" title="Enregistrer ce message et ses réglages dans « Mes messages » pour le refaire plus tard">＋ Enregistrer dans mes messages</button>
+          <button class="btn-cast" id="btn-cast" onclick="broadcast()">◈ DIFFUSER</button>
+          <div class="cast-export">
+            <select id="exp-format" title="Format d'export image">
+              <option value="png3">PNG · HD</option>
+              <option value="png15">PNG · léger</option>
+              <option value="webp" selected>WebP</option>
+              <option value="jpg">JPEG</option>
+            </select>
+            <button class="btn-export" onclick="exportPng()" title="Télécharger la carte en image">Image</button>
+          </div>
+        </div>
+        <div class="ctrl-hint" id="cast-hint"></div>
+      </div>
+    </div>
+
+    <!-- 3 · ONGLETS : MES MESSAGES · BIBLIOTHÈQUE · RÉGLAGES · HISTORIQUE -->
+    <div class="tabs-block win">
+      <div class="tabs-bar">
+        <button class="tab-btn active" data-tab="saved" onclick="showTab('saved')">◈ Mes messages <span class="tab-n" id="saved-n">0</span></button>
+        <button class="tab-btn" data-tab="lib" onclick="showTab('lib')">Bibliothèque</button>
+        <button class="tab-btn" data-tab="opts" onclick="showTab('opts')">Réglages de diffusion</button>
+        <button class="tab-btn" data-tab="hist" onclick="showTab('hist')">Historique <span class="tab-n" id="hist-n">0</span></button>
+        <input type="text" id="lib-search" class="lib-search" placeholder="Filtrer…" oninput="buildCatsUI();renderSaved();renderHistory()">
+      </div>
+
+      <!-- MES MESSAGES -->
+      <div class="tab-pane active" id="tab-saved">
+        <div class="saved-body" id="saved-body"></div>
+      </div>
+
+      <!-- BIBLIOTHÈQUE -->
+      <div class="tab-pane" id="tab-lib">
+        <div class="cats-sub" id="cats-sub">Mode : Une constellation</div>
+        <div class="cats-body" id="cats-container"></div>
+      </div>
+
+      <!-- RÉGLAGES -->
+      <div class="tab-pane" id="tab-opts">
+        <div class="cast-body">
+          <div class="cast-sec cast-grid five">
+            <div class="ctrl-group">
+              <div class="ctrl-lbl">Durée (s) · 0 = jusqu'au clic</div>
+              <div class="inline"><input type="number" id="opt-duration" min="0" max="600" step="0.5" value="8"><input type="range" id="opt-duration-r" min="0" max="60" step="0.5" value="8" oninput="syncDur(this.value)"></div>
+            </div>
+            <div class="ctrl-group">
+              <div class="ctrl-lbl">Position</div>
+              <select id="opt-position"><option value="top">Haut</option><option value="center" selected>Centre</option><option value="bottom">Bas</option></select>
+            </div>
+            <div class="ctrl-group">
+              <div class="ctrl-lbl">Largeur (px)</div>
+              <input type="number" id="opt-width" min="320" max="1600" step="10" value="760">
+            </div>
+            <div class="ctrl-group">
+              <div class="ctrl-lbl">Échelle (%)</div>
+              <input type="number" id="opt-zoom" min="50" max="200" step="5" value="100">
+            </div>
+            <div class="ctrl-group">
+              <div class="ctrl-lbl">Options</div>
+              <label class="chk"><input type="checkbox" id="opt-dismiss" checked> Fermeture d'un clic</label>
+              <label class="chk"><input type="checkbox" id="opt-chat" checked> Copie dans le chat</label>
+              <label class="chk"><input type="checkbox" id="opt-cattag" checked onchange="updateCatTag()"> Étiquette de catégorie</label>
+            </div>
+          </div>
+          <div class="cast-sec cast-grid five">
+            <div class="ctrl-group" style="grid-column:span 2">
+              <div class="ctrl-lbl">Son</div>
+              <div class="inline">
+                <select id="opt-sound" onchange="onSoundChange()"></select>
+                <button class="reg-btn reg-btn-folder" onclick="previewSound()" title="Écouter">Écouter</button>
+              </div>
+            </div>
+            <div class="ctrl-group">
+              <div class="ctrl-lbl">Volume <span id="vol-lbl">80</span>%</div>
+              <input type="range" id="opt-volume" min="0" max="100" step="5" value="80" oninput="document.getElementById('vol-lbl').textContent=this.value">
+            </div>
+            <div class="ctrl-group" style="grid-column:span 2" id="grp-soundpath">
+              <div class="ctrl-lbl">Fichier audio personnalisé</div>
+              <div class="inline"><input type="text" id="opt-soundpath" placeholder="modules/.../mon-son.ogg"><button class="reg-btn reg-btn-folder" onclick="pick('sound')">Parcourir</button></div>
+            </div>
+          </div>
+          <div class="cast-sec cast-grid five">
+            <div class="ctrl-group">
+              <div class="ctrl-lbl">Barre haute</div>
+              <input type="text" id="opt-top" value="SYS::CONSTELLATION_LINK" oninput="updateBars()">
+            </div>
+            <div class="ctrl-group">
+              <div class="ctrl-lbl">Barre basse</div>
+              <input type="text" id="opt-bot" value="CONSTELLATION.NETWORK · NOTIFICATION.SYS" oninput="updateBars()">
+            </div>
+            <div class="ctrl-group" style="grid-column:span 3">
+              <div class="ctrl-lbl">Image au-dessus du texte</div>
+              <div class="inline"><input type="text" id="opt-image" placeholder="chemin ou URL d'une image" oninput="updateImage()"><button class="reg-btn reg-btn-folder" onclick="pick('image')">Parcourir</button><button class="reg-btn" style="color:var(--text3);border-color:var(--border2)" onclick="document.getElementById('opt-image').value='';updateImage()">Retirer</button></div>
+            </div>
+          </div>
+          <div class="cast-sec presets-row">
+            <div class="ctrl-lbl">Préréglages d'ambiance <span class="ctrl-hint">— mémorisent thème, couleurs, police, son, volume, durée, position, taille et barres</span></div>
+            <div class="preset-list" id="preset-list"></div>
+            <div class="preset-row">
+              <input type="text" id="preset-name" placeholder="Nom du préréglage…">
+              <button class="reg-btn reg-btn-new" onclick="savePreset()">Enregistrer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORIQUE -->
+      <div class="tab-pane" id="tab-hist">
+        <div class="cats-sub"><button class="reg-btn" style="color:var(--text3);border-color:var(--border2)" onclick="clearHistory()">Vider l'historique</button></div>
+        <div class="hist-body" id="hist-body"><div class="reg-empty">Aucune diffusion pour l'instant</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL DOSSIER -->
+<div class="modal-overlay" id="modal-folder" onclick="closeModalIf(event,'modal-folder')">
+  <div class="modal">
+    <div class="modal-title">Nouveau dossier</div>
+    <div class="modal-field"><label>Nom du dossier</label><input type="text" id="mf-name" placeholder="Ex: Narrateurs, Bien, Destruction..."></div>
+    <div class="modal-field"><label>Catégorie narrative</label><select id="mf-cat"></select></div>
+    <div class="modal-btns"><button class="modal-btn modal-btn-ok" onclick="saveFolder()">Créer</button><button class="modal-btn modal-btn-cancel" onclick="closeModal('modal-folder')">Annuler</button></div>
+  </div>
+</div>
+<!-- MODAL CONSTELLATION -->
+<div class="modal-overlay" id="modal-const" onclick="closeModalIf(event,'modal-const')">
+  <div class="modal">
+    <div class="modal-title">Nouvelle constellation</div>
+    <div class="modal-field"><label>Nom de la constellation</label><input type="text" id="mc-name" placeholder="Ex: Le Dévoreur de Fins Heureuses"></div>
+    <div class="modal-field"><label>Dossier</label><select id="mc-folder"></select></div>
+    <div class="modal-btns"><button class="modal-btn modal-btn-ok" onclick="saveConst()">Ajouter</button><button class="modal-btn modal-btn-cancel" onclick="closeModal('modal-const')">Annuler</button></div>
+  </div>
+</div>
+<!-- MODAL NOM DU MESSAGE -->
+<div class="modal-overlay" id="modal-save" onclick="closeModalIf(event,'modal-save')">
+  <div class="modal">
+    <div class="modal-title">Enregistrer dans mes messages</div>
+    <div class="modal-field"><label>Nom court (pour le retrouver)</label><input type="text" id="ms-name" placeholder="Ex: Alerte donjon rang S"></div>
+    <div class="ctrl-hint">Le texte, la constellation, la couleur, la police, le son, la durée, la position, les barres et l'image sont mémorisés ensemble.</div>
+    <div class="modal-btns"><button class="modal-btn modal-btn-ok" onclick="saveMessageConfirm()">Enregistrer</button><button class="modal-btn modal-btn-cancel" onclick="closeModal('modal-save')">Annuler</button></div>
+  </div>
+</div>
+<!-- MODAL CONFIRMATION -->
+<div class="modal-overlay" id="modal-confirm" onclick="closeModalIf(event,'modal-confirm')">
+  <div class="modal">
+    <div class="modal-title" id="mcf-title">Confirmer</div>
+    <div class="ctrl-hint" id="mcf-text"></div>
+    <div class="modal-btns"><button class="modal-btn modal-btn-ok" id="mcf-ok">Confirmer</button><button class="modal-btn modal-btn-cancel" onclick="closeModal('modal-confirm')">Annuler</button></div>
+  </div>
+</div>
+
+<script>
+/* ── Couleurs personnalisées : génère les 17 variables --t-* d'un thème à partir de 2 couleurs ── */
+function nmHex2rgb(h){ h=String(h||"#1e7ae8").replace("#",""); if(h.length===3) h=h.split("").map(c=>c+c).join(""); const n=parseInt(h.slice(0,6),16); return [(n>>16)&255,(n>>8)&255,n&255]; }
+function nmRgb2hsl(r,g,b){ r/=255;g/=255;b/=255; const mx=Math.max(r,g,b),mn=Math.min(r,g,b); let h=0,s=0; const l=(mx+mn)/2; if(mx!==mn){ const d=mx-mn; s=l>.5?d/(2-mx-mn):d/(mx+mn); if(mx===r) h=(g-b)/d+(g<b?6:0); else if(mx===g) h=(b-r)/d+2; else h=(r-g)/d+4; h/=6; } return [h,s,l]; }
+function nmHsl2rgb(h,s,l){ if(s===0){ const v=Math.round(l*255); return [v,v,v]; } const q=l<.5?l*(1+s):l+s-l*s, p=2*l-q; const f=t=>{ if(t<0)t+=1; if(t>1)t-=1; if(t<1/6) return p+(q-p)*6*t; if(t<1/2) return q; if(t<2/3) return p+(q-p)*(2/3-t)*6; return p; }; return [Math.round(f(h+1/3)*255),Math.round(f(h)*255),Math.round(f(h-1/3)*255)]; }
+function nmShade(hex,dl,ds){ const [h,s,l]=nmRgb2hsl(...nmHex2rgb(hex)); const [r,g,b]=nmHsl2rgb(h,Math.max(0,Math.min(1,s+(ds||0))),Math.max(0,Math.min(1,l+dl))); return "#"+[r,g,b].map(v=>v.toString(16).padStart(2,"0")).join(""); }
+function nmRgba(hex,a){ const [r,g,b]=nmHex2rgb(hex); return `rgba(${r},${g},${b},${a})`; }
+/* main = couleur du corps de la fenêtre, glow = couleur des lueurs / liserés */
+function nmCustomVars(main, glow){
+  main = main || "#1e7ae8"; glow = glow || nmShade(main, .28, .1);
+  return {
+    "--t-bar1": nmShade(main,-.14), "--t-bar2": nmShade(main,-.10), "--t-bar3": nmShade(main,-.07),
+    "--t-main1": nmShade(main,-.03), "--t-main2": main, "--t-main3": nmShade(main,.05),
+    "--t-glow": nmRgba(glow,.9), "--t-border": nmRgba(glow,.4), "--t-corner": nmRgba(nmShade(glow,.15),.8),
+    "--t-side": nmShade(glow,.06), "--t-hline": nmRgba(glow,.6), "--t-hcenter": nmRgba(nmShade(glow,.3),.97),
+    "--t-card-border": nmRgba(glow,.67), "--t-card-border2": nmRgba(nmShade(main,-.12),.27), "--t-card-inset": nmRgba(nmShade(glow,.1),.53),
+    "--t-botbar-txt": nmRgba(nmShade(glow,.15),.45), "--t-scan": nmRgba(nmShade(glow,.25),.4), "--t-deco": nmRgba(nmShade(glow,.15),.55)
+  };
+}
+
+const CAT_COLORS = {
+  'Narrateurs':'#e0e8ff','Bien':'#ffd060','Mal':'#ff4050','Chaos':'#ff8030',
+  'Mort':'#9040b0','Temps':'#60a8e0','Ambiguës':'#909090','Destruction':'#cc2020',
+  'Équilibre':'#30cc70','Érudition':'#00d8e0','Chasse':'#e09020','Harmonie':'#ff80b0',
+  'Finitude':'#c060e0','Propagation':'#80e020','Mémoire':'#8090e0','Néant':'#303040',
+  'Abondance':'#40a840','Beauté':'#ffb0d0','Préservation':'#4080c0','Ordre':'#e8e8d0',
+  'Permanence':'#c09050','Trailblaze':'#ff7a3c','Enigmata':'#9030d0',
+  'Marchands':'#ffc94a','L\'Abysse':'#5fffc8','Le Grouillement':'#7fff80'
+};
+
+/* Modes émetteurs */
+const MODES = [
+  { id:'une',        label:'Une constellation',          prefix:'La constellation "%N"',                 plural:false },
+  { id:'categorie',  label:'Une catégorie',              prefix:'Les constellations %C',                 plural:true  },
+  { id:'anonyme',    label:'Anonyme',                    prefix:'Une constellation inconnue',            plural:false },
+  { id:'silencieuse',label:'Silencieuse',                prefix:'Une constellation qui n\'avait pas parlé depuis longtemps', plural:false },
+  { id:'poignee',    label:'Une poignée',                prefix:'Une poignée de constellations',         plural:true  },
+  { id:'quelques',   label:'Quelques-unes',              prefix:'Quelques constellations',               plural:true  },
+  { id:'minorite',   label:'Une minorité',               prefix:'Une minorité de constellations',        plural:true  },
+  { id:'plusieurs',  label:'Plusieurs',                  prefix:'Plusieurs constellations',              plural:true  },
+  { id:'nombreuses', label:'De nombreuses',              prefix:'De nombreuses constellations',          plural:true  },
+  { id:'majorite',   label:'Une majorité',               prefix:'Une majorité de constellations',        plural:true  },
+  { id:'rivales',    label:'Deux rivales',               prefix:'Deux constellations aux intérêts opposés', plural:true },
+  { id:'quasi',      label:'La quasi-totalité',          prefix:'La quasi-totalité des constellations',  plural:true  },
+  { id:'toutes',     label:'Toutes',                     prefix:'Toutes les constellations',             plural:true  },
+];
+
+let currentMode  = 'une';
+let currentTheme = 'bleu';
+let currentTmpl  = '';
+
+/* ── Catégories & registre pré-rempli (issus du Registre des Constellations v6) ── */
+const CAT_DEFS=[{id:"narrateurs",fam:"Nébuleuse",nom:"Narrateurs",ic:"✶",phrase:"de la Narration"},{id:"bien",fam:"Nébuleuse",nom:"Bien",ic:"☀",phrase:"du Bien"},{id:"mal",fam:"Nébuleuse",nom:"Mal",ic:"☠",phrase:"du Mal"},{id:"chaos",fam:"Nébuleuse",nom:"Chaos",ic:"✷",phrase:"du Chaos"},{id:"mort",fam:"Nébuleuse",nom:"Mort",ic:"☩",phrase:"de la Mort"},{id:"temps",fam:"Nébuleuse",nom:"Temps",ic:"⧗",phrase:"du Temps"},{id:"ambigues",fam:"Nébuleuse",nom:"Ambiguës",ic:"◐",phrase:"Ambiguës"},{id:"marchands",fam:"Nébuleuse",nom:"Marchands",ic:"⚖",phrase:"des Marchands"},{id:"destruction",fam:"Voie",nom:"Destruction",ic:"✸",phrase:"de la Destruction"},{id:"preservation",fam:"Voie",nom:"Préservation",ic:"⛨",phrase:"de la Préservation"},{id:"erudition",fam:"Voie",nom:"Érudition",ic:"❋",phrase:"de l'Érudition"},{id:"harmonie",fam:"Voie",nom:"Harmonie",ic:"♬",phrase:"de l'Harmonie"},{id:"nihility",fam:"Voie",nom:"Néant",ic:"○",phrase:"du Néant"},{id:"abondance",fam:"Voie",nom:"Abondance",ic:"❖",phrase:"de l'Abondance"},{id:"chasse",fam:"Voie",nom:"Chasse",ic:"➶",phrase:"de la Chasse"},{id:"harmony_ordre",fam:"Voie",nom:"Ordre",ic:"▦",phrase:"de l'Ordre"},{id:"permanence",fam:"Voie",nom:"Permanence",ic:"∞",phrase:"de la Permanence"},{id:"trailblaze",fam:"Voie",nom:"Trailblaze",ic:"☄",phrase:"du Trailblaze"},{id:"equilibre",fam:"Voie",nom:"Équilibre",ic:"⚖",phrase:"de l'Équilibre"},{id:"propagation",fam:"Voie",nom:"Propagation",ic:"❀",phrase:"de la Propagation"},{id:"memoire",fam:"Voie",nom:"Mémoire",ic:"◈",phrase:"de la Mémoire"},{id:"finitude",fam:"Voie",nom:"Finitude",ic:"⊘",phrase:"de la Finitude"},{id:"beaute",fam:"Voie",nom:"Beauté",ic:"✿",phrase:"de la Beauté"},{id:"enigmata",fam:"Voie",nom:"Enigmata",ic:"❄",phrase:"de l'Enigmata"},{id:"abysse",fam:"Abysse",nom:"L'Abysse",ic:"◬",phrase:"de l'Abysse"},{id:"abysse_grouille",fam:"Abysse",nom:"Le Grouillement",ic:"⁂",phrase:"du Grouillement"}];
+const SEED_FOLDERS=[{id:"seedf_narrateurs",name:"✶ Narrateurs",cat:"Narrateurs"},{id:"seedf_bien",name:"☀ Bien",cat:"Bien"},{id:"seedf_mal",name:"☠ Mal",cat:"Mal"},{id:"seedf_chaos",name:"✷ Chaos",cat:"Chaos"},{id:"seedf_mort",name:"☩ Mort",cat:"Mort"},{id:"seedf_temps",name:"⧗ Temps",cat:"Temps"},{id:"seedf_ambigues",name:"◐ Ambiguës",cat:"Ambiguës"},{id:"seedf_marchands",name:"⚖ Marchands",cat:"Marchands"},{id:"seedf_destruction",name:"✸ Destruction",cat:"Destruction"},{id:"seedf_preservation",name:"⛨ Préservation",cat:"Préservation"},{id:"seedf_erudition",name:"❋ Érudition",cat:"Érudition"},{id:"seedf_harmonie",name:"♬ Harmonie",cat:"Harmonie"},{id:"seedf_nihility",name:"○ Néant",cat:"Néant"},{id:"seedf_abondance",name:"❖ Abondance",cat:"Abondance"},{id:"seedf_chasse",name:"➶ Chasse",cat:"Chasse"},{id:"seedf_harmony_ordre",name:"▦ Ordre",cat:"Ordre"},{id:"seedf_permanence",name:"∞ Permanence",cat:"Permanence"},{id:"seedf_trailblaze",name:"☄ Trailblaze",cat:"Trailblaze"},{id:"seedf_equilibre",name:"⚖ Équilibre",cat:"Équilibre"},{id:"seedf_propagation",name:"❀ Propagation",cat:"Propagation"},{id:"seedf_memoire",name:"◈ Mémoire",cat:"Mémoire"},{id:"seedf_finitude",name:"⊘ Finitude",cat:"Finitude"},{id:"seedf_beaute",name:"✿ Beauté",cat:"Beauté"},{id:"seedf_enigmata",name:"❄ Enigmata",cat:"Enigmata"},{id:"seedf_abysse",name:"◬ L'Abysse",cat:"L'Abysse"},{id:"seedf_abysse_grouille",name:"⁂ Le Grouillement",cat:"Le Grouillement"}];
+const SEED_CONSTS=[{id:"seedc_0",name:"L'Auteur de la Dernière Page",folderId:"seedf_narrateurs"},{id:"seedc_1",name:"Celle qui Pèse les Récits",folderId:"seedf_narrateurs"},{id:"seedc_2",name:"Le Spectateur des Mille Yeux",folderId:"seedf_narrateurs"},{id:"seedc_3",name:"Les Trois Sœurs du Fil",folderId:"seedf_narrateurs"},{id:"seedc_4",name:"Le Scribe aux Doigts Tachés",folderId:"seedf_narrateurs"},{id:"seedc_5",name:"La Rumeur aux Cent Bouches",folderId:"seedf_narrateurs"},{id:"seedc_6",name:"Le Seigneur de la Flamme Juste",folderId:"seedf_bien"},{id:"seedc_7",name:"Le Gardien du Pont Ardent",folderId:"seedf_bien"},{id:"seedc_8",name:"La Dame aux Mille Bras Secourables",folderId:"seedf_bien"},{id:"seedc_9",name:"Le Porteur de Feu Enchaîné",folderId:"seedf_bien"},{id:"seedc_10",name:"L'Architecte des Secondes Chances",folderId:"seedf_bien"},{id:"seedc_11",name:"La Gardienne du Foyer Éclairé",folderId:"seedf_bien"},{id:"seedc_12",name:"Le Petit Saint des Ruelles",folderId:"seedf_bien"},{id:"seedc_13",name:"Le Porteur de Lumière Déchu",folderId:"seedf_mal"},{id:"seedc_14",name:"La Mère des Démons",folderId:"seedf_mal"},{id:"seedc_15",name:"Le Seigneur des Tempêtes Rouges",folderId:"seedf_mal"},{id:"seedc_16",name:"La Reine des Enfers Glacés",folderId:"seedf_mal"},{id:"seedc_17",name:"La Corsaire des Cieux Sans Loi",folderId:"seedf_mal"},{id:"seedc_18",name:"La Sorcière de la Hutte aux Pattes",folderId:"seedf_mal"},{id:"seedc_19",name:"Le Filou des Bas-Fonds",folderId:"seedf_mal"},{id:"seedc_20",name:"Le Père des Mensonges Rieurs",folderId:"seedf_chaos"},{id:"seedc_21",name:"La Discorde à la Pomme d'Or",folderId:"seedf_chaos"},{id:"seedc_22",name:"Le Gardien des Carrefours",folderId:"seedf_chaos"},{id:"seedc_23",name:"L'Enfant de l'Entropie",folderId:"seedf_chaos"},{id:"seedc_24",name:"Le Lutin Retourneur de Bols",folderId:"seedf_chaos"},{id:"seedc_25",name:"Le Roi des Rives Silencieuses",folderId:"seedf_mort"},{id:"seedc_26",name:"La Dame du Royaume Glacé",folderId:"seedf_mort"},{id:"seedc_27",name:"Le Seigneur Décharné",folderId:"seedf_mort"},{id:"seedc_28",name:"La Mort qui Doute",folderId:"seedf_mort"},{id:"seedc_29",name:"Le Croque-Mort aux Bougies",folderId:"seedf_mort"},{id:"seedc_30",name:"Le Vieillard qui Dévore ses Enfants",folderId:"seedf_temps"},{id:"seedc_31",name:"La Danseuse de la Fin des Ères",folderId:"seedf_temps"},{id:"seedc_32",name:"Le Gardien aux Deux Visages",folderId:"seedf_temps"},{id:"seedc_33",name:"L'Heure Zéro",folderId:"seedf_temps"},{id:"seedc_34",name:"Le Sablier Fêlé",folderId:"seedf_temps"},{id:"seedc_35",name:"La Dame aux Ailes de Tempête",folderId:"seedf_ambigues"},{id:"seedc_36",name:"Le Renard aux Neuf Queues",folderId:"seedf_ambigues"},{id:"seedc_37",name:"La Sorcière aux Trois Chemins",folderId:"seedf_ambigues"},{id:"seedc_38",name:"Le Chat à la Pièce Truquée",folderId:"seedf_ambigues"},{id:"seedc_39",name:"Le Créateur",folderId:"seedf_marchands"},{id:"seedc_40",name:"Le Messager aux Talons Ailés",folderId:"seedf_marchands"},{id:"seedc_41",name:"La Dame de la Bonne Fortune",folderId:"seedf_marchands"},{id:"seedc_42",name:"La Dame du Lotus Doré",folderId:"seedf_marchands"},{id:"seedc_43",name:"Le Marchand de Prix Justes",folderId:"seedf_marchands"},{id:"seedc_44",name:"Le Colporteur des Routes",folderId:"seedf_marchands"},{id:"seedc_45",name:"Le Danseur de la Fin du Monde",folderId:"seedf_destruction"},{id:"seedc_46",name:"Le Loup qui Dévorera le Soleil",folderId:"seedf_destruction"},{id:"seedc_47",name:"L'Architecte de l'Irréparable",folderId:"seedf_destruction"},{id:"seedc_48",name:"Le Casseur de Vaisselle",folderId:"seedf_destruction"},{id:"seedc_49",name:"Le Gardien aux Quatre Bras",folderId:"seedf_preservation"},{id:"seedc_50",name:"La Gardienne du Foyer Sacré",folderId:"seedf_preservation"},{id:"seedc_51",name:"Le Dernier Rempart",folderId:"seedf_preservation"},{id:"seedc_52",name:"Le Gardien de la Porte Close",folderId:"seedf_preservation"},{id:"seedc_53",name:"Le Scribe de l'Univers",folderId:"seedf_erudition"},{id:"seedc_54",name:"La Chouette aux Yeux Gris",folderId:"seedf_erudition"},{id:"seedc_55",name:"Le Pendu de l'Arbre-Monde",folderId:"seedf_erudition"},{id:"seedc_56",name:"Le Sage des Eaux Profondes",folderId:"seedf_erudition"},{id:"seedc_57",name:"La Gardienne des Secrets Utiles",folderId:"seedf_erudition"},{id:"seedc_58",name:"L'Apprenti aux Cent Questions",folderId:"seedf_erudition"},{id:"seedc_59",name:"Le Rat de Bibliothèque",folderId:"seedf_erudition"},{id:"seedc_60",name:"Le Joueur de Lyre Solaire",folderId:"seedf_harmonie"},{id:"seedc_61",name:"La Déesse Cachée dans la Grotte",folderId:"seedf_harmonie"},{id:"seedc_62",name:"Les Neuf Sœurs de l'Inspiration",folderId:"seedf_harmonie"},{id:"seedc_63",name:"Le Ménestrel des Carrefours",folderId:"seedf_harmonie"},{id:"seedc_64",name:"L'Abîme d'Avant le Monde",folderId:"seedf_nihility"},{id:"seedc_65",name:"Le Gouffre Béant Originel",folderId:"seedf_nihility"},{id:"seedc_66",name:"Les Eaux Immobiles d'Avant l'Aube",folderId:"seedf_nihility"},{id:"seedc_67",name:"Celui qui Efface jusqu'au Souvenir",folderId:"seedf_nihility"},{id:"seedc_68",name:"L'Ombre sous le Lit",folderId:"seedf_nihility"},{id:"seedc_69",name:"La Mère de Toutes les Moissons",folderId:"seedf_abondance"},{id:"seedc_70",name:"Celui qui Renaît du Grain",folderId:"seedf_abondance"},{id:"seedc_71",name:"La Source qui ne Tarit Pas",folderId:"seedf_abondance"},{id:"seedc_72",name:"Le Petit Esprit du Garde-Manger",folderId:"seedf_abondance"},{id:"seedc_73",name:"La Dame à l'Arc d'Argent",folderId:"seedf_chasse"},{id:"seedc_74",name:"Le Traqueur de la Chasse Sauvage",folderId:"seedf_chasse"},{id:"seedc_75",name:"Le Cornu des Bois Profonds",folderId:"seedf_chasse"},{id:"seedc_76",name:"L'Explorateur qui ne Renonce Jamais",folderId:"seedf_chasse"},{id:"seedc_77",name:"Le Furet Chasseur",folderId:"seedf_chasse"},{id:"seedc_78",name:"Le Roi sur le Trône de Foudre",folderId:"seedf_harmony_ordre"},{id:"seedc_79",name:"L'Empereur de Jade Céleste",folderId:"seedf_harmony_ordre"},{id:"seedc_80",name:"Le Législateur aux Cinquante Noms",folderId:"seedf_harmony_ordre"},{id:"seedc_81",name:"Le Greffier Tatillon",folderId:"seedf_harmony_ordre"},{id:"seedc_82",name:"Celui qui Renaît de ses Cendres",folderId:"seedf_permanence"},{id:"seedc_83",name:"L'Arbre qui Porte les Neuf Mondes",folderId:"seedf_permanence"},{id:"seedc_84",name:"Celui qui Était là Avant",folderId:"seedf_permanence"},{id:"seedc_85",name:"La Vieille Borne du Chemin",folderId:"seedf_permanence"},{id:"seedc_86",name:"Le Demi-Dieu qui Pêcha les Îles",folderId:"seedf_trailblaze"},{id:"seedc_87",name:"Le Voleur de Feu",folderId:"seedf_trailblaze"},{id:"seedc_88",name:"La Brute au Grand Cœur des Cieux",folderId:"seedf_bien"},{id:"seedc_89",name:"Le Mousse Téméraire",folderId:"seedf_chasse"},{id:"seedc_90",name:"Le Souffle des Deux Principes",folderId:"seedf_equilibre"},{id:"seedc_91",name:"Celle qui Tient la Balance du Monde",folderId:"seedf_equilibre"},{id:"seedc_92",name:"L'Équilibre Imparfait",folderId:"seedf_equilibre"},{id:"seedc_93",name:"Le Peseur de Marché",folderId:"seedf_equilibre"},{id:"seedc_94",name:"La Déesse aux Cent Fruits",folderId:"seedf_propagation"},{id:"seedc_95",name:"Celle qui ne Sait pas S'arrêter",folderId:"seedf_propagation"},{id:"seedc_96",name:"Le Maître de l'Essaim",folderId:"seedf_propagation"},{id:"seedc_97",name:"Le Semeur du Bord du Chemin",folderId:"seedf_propagation"},{id:"seedc_98",name:"La Mère des Neuf Muses",folderId:"seedf_memoire"},{id:"seedc_99",name:"Les Deux Corbeaux de la Pensée",folderId:"seedf_memoire"},{id:"seedc_100",name:"La Nostalgique Éternelle",folderId:"seedf_memoire"},{id:"seedc_101",name:"Le Gardien des Noms Perdus",folderId:"seedf_memoire"},{id:"seedc_102",name:"La Prophétesse du Crépuscule des Dieux",folderId:"seedf_finitude"},{id:"seedc_103",name:"Le Temps qui Détruit Tout",folderId:"seedf_finitude"},{id:"seedc_104",name:"La Faucheuse des Histoires Inachevées",folderId:"seedf_finitude"},{id:"seedc_105",name:"Le Sonneur du Dernier Glas",folderId:"seedf_finitude"},{id:"seedc_106",name:"Celle qui Naquit de l'Écume",folderId:"seedf_beaute"},{id:"seedc_107",name:"La Dame au Trône de Beauté",folderId:"seedf_beaute"},{id:"seedc_108",name:"Le Miroir des Pires Versions",folderId:"seedf_beaute"},{id:"seedc_109",name:"L'Esprit du Joli Rien",folderId:"seedf_beaute"},{id:"seedc_110",name:"Celui dont la Question est la Réponse",folderId:"seedf_enigmata"},{id:"seedc_111",name:"La Gardienne de l'Énigme Mortelle",folderId:"seedf_enigmata"},{id:"seedc_112",name:"Le Gardien au Visage Effacé",folderId:"seedf_enigmata"},{id:"seedc_113",name:"Le Chiffre qui Manque",folderId:"seedf_enigmata"},{id:"seedc_114",name:"L'Embrasement sans Fin",folderId:"seedf_mal"},{id:"seedc_115",name:"Le Dieu sans Corne",folderId:"seedf_mal"},{id:"seedc_116",name:"Le Fossoyeur des Rives Mortes",folderId:"seedf_mal"},{id:"seedc_117",name:"Le Fil de l'Histoire",folderId:"seedf_narrateurs"},{id:"seedc_118",name:"La Déesse du Jugement",folderId:"seedf_bien"},{id:"seedc_119",name:"La Gardienne des Serments",folderId:"seedf_bien"},{id:"seedc_120",name:"Le Cataclysme Purificateur",folderId:"seedf_bien"},{id:"seedc_121",name:"La Reine au Diadème d'Étoiles",folderId:"seedf_harmony_ordre"},{id:"seedc_122",name:"Le Disque qui Traverse le Ciel",folderId:"seedf_bien"},{id:"seedc_123",name:"Le Fléau Casqué de Bronze",folderId:"seedf_destruction"},{id:"seedc_124",name:"La Dévoreuse aux Mille Bras",folderId:"seedf_destruction"},{id:"seedc_125",name:"Le Porteur du Marteau Foudroyant",folderId:"seedf_destruction"},{id:"seedc_126",name:"La Mère du Désir",folderId:"seedf_beaute"},{id:"seedc_127",name:"L'Ébranleur de la Terre",folderId:"seedf_destruction"},{id:"seedc_128",name:"Le Seigneur de la Vigne Ivre",folderId:"seedf_abondance"},{id:"seedc_129",name:"Le Forgeron Boiteux des Dieux",folderId:"seedf_erudition"},{id:"seedc_130",name:"Le Danseur à la Flûte Bleue",folderId:"seedf_harmonie"},{id:"seedc_131",name:"La Reine des Ténèbres d'En-Bas",folderId:"seedf_mort"},{id:"seedc_132",name:"La Vierge à l'Égide",folderId:"seedf_preservation"},{id:"seedc_133",name:"La Mère aux Ailes Déployées",folderId:"seedf_propagation"},{id:"seedc_134",name:"Celle aux Doigts de Rose",folderId:"seedf_temps"},{id:"seedc_135",name:"La Voyageuse aux Trois Visages",folderId:"seedf_enigmata"},{id:"seedc_136",name:"Le Trône Vivant de la Royauté",folderId:"seedf_harmony_ordre"},{id:"seedc_137",name:"Le Juge des Dix Tribunaux",folderId:"seedf_harmony_ordre"},{id:"seedc_138",name:"Le Gardien du Contrat Solaire",folderId:"seedf_harmony_ordre"},{id:"seedc_139",name:"La Souveraine du Soleil Levant",folderId:"seedf_bien"},{id:"seedc_140",name:"Le Champion Septuple",folderId:"seedf_bien"},{id:"seedc_141",name:"Le Porteur de Masse Fidèle",folderId:"seedf_bien"},{id:"seedc_142",name:"La Gardienne de l'Espérance",folderId:"seedf_bien"},{id:"seedc_143",name:"Le Serpent qui Dévore le Soleil",folderId:"seedf_mal"},{id:"seedc_144",name:"Le Roi aux Dix Têtes",folderId:"seedf_mal"},{id:"seedc_145",name:"Le Prince des Mouches",folderId:"seedf_mal"},{id:"seedc_146",name:"Le Dieu Noir des Malheurs",folderId:"seedf_mal"},{id:"seedc_147",name:"Le Miroir Fumant",folderId:"seedf_mal"},{id:"seedc_148",name:"La Lionne Assoiffée de Sang",folderId:"seedf_chaos"},{id:"seedc_149",name:"Le Maître de la Foudre Vengeresse",folderId:"seedf_chaos"},{id:"seedc_150",name:"Le Mendiant aux Cheveux de Feu",folderId:"seedf_chaos"},{id:"seedc_151",name:"Le Colibri de la Guerre Solaire",folderId:"seedf_destruction"},{id:"seedc_152",name:"Le Géant qui Forge la Fin",folderId:"seedf_destruction"},{id:"seedc_153",name:"La Gardienne Noire du Champ de Mort",folderId:"seedf_destruction"},{id:"seedc_154",name:"L'Empereur aux Cinq Grains",folderId:"seedf_erudition"},{id:"seedc_155",name:"Le Dieu aux Longs Bras Savants",folderId:"seedf_erudition"},{id:"seedc_156",name:"Le Vieux Chantre Éternel",folderId:"seedf_erudition"},{id:"seedc_157",name:"Le Bœuf des Lettrés",folderId:"seedf_erudition"},{id:"seedc_158",name:"Le Chantre qui Charma la Mort",folderId:"seedf_harmonie"},{id:"seedc_159",name:"La Tisseuse du Fil Rouge",folderId:"seedf_harmonie"},{id:"seedc_160",name:"La Demoiselle du Printemps",folderId:"seedf_harmonie"},{id:"seedc_161",name:"La Vierge Chasseresse des Bois",folderId:"seedf_chasse"},{id:"seedc_162",name:"Le Chasseur aux Étoiles",folderId:"seedf_chasse"},{id:"seedc_163",name:"Le Seigneur au Trident des Bêtes",folderId:"seedf_chasse"},{id:"seedc_164",name:"La Dame du Collier d'Or",folderId:"seedf_abondance"},{id:"seedc_165",name:"La Déesse à la Gerbe de Blé",folderId:"seedf_abondance"},{id:"seedc_166",name:"Le Prince des Fleurs et du Maïs",folderId:"seedf_abondance"},{id:"seedc_167",name:"La Mère aux Ailes Protectrices",folderId:"seedf_preservation"},{id:"seedc_168",name:"La Gardienne du Seuil Céleste",folderId:"seedf_preservation"},{id:"seedc_169",name:"Le Gardien des Portes",folderId:"seedf_preservation"},{id:"seedc_170",name:"La Dame de la Maison de Vie",folderId:"seedf_memoire"},{id:"seedc_171",name:"Le Fleuve du Souvenir",folderId:"seedf_memoire"},{id:"seedc_172",name:"Le Temps Infini Premier",folderId:"seedf_temps"},{id:"seedc_173",name:"Le Porteur des Cycles du Monde",folderId:"seedf_temps"},{id:"seedc_174",name:"Le Serpent à Plumes",folderId:"seedf_propagation"},{id:"seedc_175",name:"La Petite Mère Humide de la Terre",folderId:"seedf_propagation"},{id:"seedc_176",name:"Le Seigneur Juste de la Mort",folderId:"seedf_finitude"},{id:"seedc_177",name:"Le Démon au Marteau",folderId:"seedf_finitude"},{id:"seedc_178",name:"Le Dieu Radieux Bien-Aimé",folderId:"seedf_beaute"},{id:"seedc_179",name:"La Céleste Danseuse des Cieux",folderId:"seedf_beaute"},{id:"seedc_180",name:"Le Sage d'Avant le Déluge",folderId:"seedf_enigmata"},{id:"seedc_181",name:"La Dame du Lac Voilé",folderId:"seedf_enigmata"},{id:"seedc_182",name:"Le Roi qui Chercha l'Immortalité",folderId:"seedf_trailblaze"},{id:"seedc_183",name:"La Navigatrice des Étoiles",folderId:"seedf_trailblaze"},{id:"seedc_184",name:"Le Juge à Tête d'Ibis des Balances",folderId:"seedf_equilibre"},{id:"seedc_185",name:"La Déesse de la Juste Indignation",folderId:"seedf_equilibre"},{id:"seedc_186",name:"Le Vide qui Libère",folderId:"seedf_nihility"},{id:"seedc_187",name:"Le Non-Agir Originel",folderId:"seedf_nihility"},{id:"seedc_188",name:"Les Huit qui ne Meurent Pas",folderId:"seedf_permanence"},{id:"seedc_189",name:"Le Dieu des Bornes Immuables",folderId:"seedf_permanence"},{id:"seedc_190",name:"Le Patron des Voies et des Caravanes",folderId:"seedf_marchands"},{id:"seedc_191",name:"La Déesse de la Monnaie",folderId:"seedf_marchands"},{id:"seedc_192",name:"La Dame des Eaux Douces",folderId:"seedf_ambigues"},{id:"seedc_193",name:"Le Messager aux Deux Royaumes",folderId:"seedf_ambigues"},{id:"seedc_194",name:"Le Baron du Cimetière",folderId:"seedf_mort"},{id:"seedc_195",name:"Le Sommeil Jumeau de la Mort",folderId:"seedf_mort"},{id:"seedc_196",name:"La Déesse Volcanique au Cœur Ardent",folderId:"seedf_harmonie"},{id:"seedc_197",name:"Le Médecin au Bâton Serpentin",folderId:"seedf_bien"},{id:"seedc_198",name:"La Dame au Luth du Savoir",folderId:"seedf_erudition"},{id:"seedc_199",name:"Le Seigneur de la Tempête du Déluge",folderId:"seedf_destruction"},{id:"seedc_200",name:"Celui qui Rampe entre les Lignes",folderId:"seedf_abysse"},{id:"seedc_201",name:"La Chèvre Noire des Forêts Stellaires",folderId:"seedf_abysse"},{id:"seedc_202",name:"Celui qui Avale les Récits",folderId:"seedf_abysse"},{id:"seedc_203",name:"Le Sultan Aveugle au Centre de Tout",folderId:"seedf_abysse"},{id:"seedc_204",name:"Le Dormeur de la Cité Engloutie",folderId:"seedf_abysse"},{id:"seedc_205",name:"La Porte et la Clé de l'Au-Delà",folderId:"seedf_abysse"},{id:"seedc_206",name:"La Tisseuse qui Fige les Proies",folderId:"seedf_abysse_grouille"},{id:"seedc_207",name:"La Mère des Mille Pattes",folderId:"seedf_abysse_grouille"},{id:"seedc_208",name:"Le Chœur des Bouches Inutiles",folderId:"seedf_abysse_grouille"},{id:"seedc_209",name:"Le Limier d'Entre les Angles",folderId:"seedf_abysse_grouille"},{id:"seedc_210",name:"Le Ver qui Habite les Couleurs",folderId:"seedf_abysse_grouille"},{id:"seedc_211",name:"Le Roi sous la Couronne d'Os",folderId:"seedf_mort"},{id:"seedc_212",name:"La Dame aux Corbeaux du Champ Mort",folderId:"seedf_mort"},{id:"seedc_213",name:"La Mère de Tous les Monstres",folderId:"seedf_chasse"},{id:"seedc_214",name:"Le Seigneur des Cauchemars",folderId:"seedf_enigmata"},{id:"seedc_215",name:"Le Dévoreur de Mondes Affamé",folderId:"seedf_mal"},{id:"seedc_216",name:"La Reine de la Ruche Unanime",folderId:"seedf_propagation"},{id:"seedc_217",name:"Le Gardien de la Dernière Graine",folderId:"seedf_preservation"},{id:"seedc_218",name:"Le Forgeron des Armes de Fin du Monde",folderId:"seedf_destruction"},{id:"seedc_219",name:"Le Chevalier de la Dernière Aube",folderId:"seedf_bien"},{id:"seedc_220",name:"La Voix qui Accorde les Mondes",folderId:"seedf_harmonie"},{id:"seedc_221",name:"L'Horloger des Lois du Monde",folderId:"seedf_harmony_ordre"},{id:"seedc_222",name:"La Bibliothèque qui Marche",folderId:"seedf_memoire"},{id:"seedc_223",name:"Le Mangeur d'Instants",folderId:"seedf_temps"},{id:"seedc_224",name:"Le Miroir qui Emprisonne",folderId:"seedf_beaute"},{id:"seedc_225",name:"Celui qui a Lu le Livre Interdit",folderId:"seedf_erudition"},{id:"seedc_226",name:"La Corne qui Déborde sans Fin",folderId:"seedf_abondance"},{id:"seedc_227",name:"Celui qui Défait ce qui Fut Tissé",folderId:"seedf_nihility"},{id:"seedc_228",name:"Le Témoin de Toutes les Fins",folderId:"seedf_permanence"},{id:"seedc_229",name:"La Première à Franchir le Vide",folderId:"seedf_trailblaze"},{id:"seedc_230",name:"Celui qui Tient les Plateaux du Réel",folderId:"seedf_equilibre"},{id:"seedc_231",name:"Le Bouffon qui Réécrit les Règles",folderId:"seedf_chaos"},{id:"seedc_232",name:"Celui qui Offre des Marchés Parfaits",folderId:"seedf_ambigues"},{id:"seedc_233",name:"Celle qui Donne le Fil pour Revenir",folderId:"seedf_enigmata"},{id:"seedc_234",name:"Le Chacal qui Pèse les Cœurs",folderId:"seedf_mort"},{id:"seedc_235",name:"Le Tueur de la Bête au Cœur du Dédale",folderId:"seedf_chasse"},{id:"seedc_236",name:"Le Héros aux Douze Travaux",folderId:"seedf_destruction"},{id:"seedc_237",name:"L'Homme aux Mille Ruses",folderId:"seedf_erudition"},{id:"seedc_238",name:"Le Tueur de la Gorgone",folderId:"seedf_chasse"},{id:"seedc_239",name:"Le Guerrier au Talon Fatal",folderId:"seedf_finitude"},{id:"seedc_240",name:"La Fille qui Prit la Place de son Père",folderId:"seedf_bien"},{id:"seedc_241",name:"Le Tueur du Dragon des Landes",folderId:"seedf_destruction"},{id:"seedc_242",name:"Le Guerrier saisi par la Fureur",folderId:"seedf_destruction"},{id:"seedc_243",name:"Le Veilleur de la Grande Salle",folderId:"seedf_preservation"},{id:"seedc_244",name:"La Chatte aux Yeux d'Or",folderId:"seedf_propagation"},{id:"seedc_245",name:"Le Seigneur Crocodile des Eaux",folderId:"seedf_chasse"},{id:"seedc_246",name:"Celui qui Créa le Monde par le Verbe",folderId:"seedf_erudition"},{id:"seedc_247",name:"Le Dieu qui Donna sa Main au Loup",folderId:"seedf_bien"},{id:"seedc_248",name:"La Reine qui Sait Tous les Destins",folderId:"seedf_memoire"},{id:"seedc_249",name:"Le Dévoreur des Racines du Monde",folderId:"seedf_abysse"},{id:"seedc_250",name:"Celui qui Ôte les Obstacles du Chemin",folderId:"seedf_bien"},{id:"seedc_251",name:"Le Roi du Ciel à la Foudre",folderId:"seedf_destruction"},{id:"seedc_252",name:"Le Dieu aux Sept Langues de Flamme",folderId:"seedf_destruction"},{id:"seedc_253",name:"Le Dieu des Tempêtes Banni",folderId:"seedf_destruction"},{id:"seedc_254",name:"Le Seigneur de la Lune Solitaire",folderId:"seedf_memoire"},{id:"seedc_255",name:"Le Dieu aux Clés du Ciel",folderId:"seedf_harmony_ordre"},{id:"seedc_256",name:"La Reine aux Deux Royaumes des Saisons",folderId:"seedf_abondance"},{id:"seedc_257",name:"Le Père Serein de la Sagesse",folderId:"seedf_harmonie"},{id:"seedc_258",name:"La Dame à la Jupe d'Étoiles",folderId:"seedf_finitude"}];
+function buildCats(mode){
+  /* Les templates utilisent %P = prefix du mode, %N = nom constellation */
+  /* Pour les modes pluriels, on supprime la partie "%N" des templates singuliers */
+  const m = MODES.find(x=>x.id===mode) || MODES[0];
+
+  return [
+    { name:'Notifications basiques', color:'#cfd8ff', items:[
+      'Vous avez effectué votre premier meurtre.',
+      'Nouveau scénario principal disponible.',
+      'Scénario accompli.',
+      'Échec du scénario.',
+      'Récompense distribuée.',
+      'Pénalité appliquée.',
+      'Vous avez obtenu un nouveau titre.',
+      'Votre niveau a augmenté.',
+      'Nouvelle compétence acquise.',
+      'Compétence améliorée.',
+      'Objet rare obtenu.',
+      'Vous avez découvert une condition cachée.',
+      'Succès caché débloqué.',
+      'Zone dangereuse détectée.',
+      'Un nouveau participant est entré dans le scénario.',
+      'Un participant a été éliminé.',
+      'Temps restant : bientôt épuisé.',
+      'Votre réputation a changé.',
+      'Un contrat vous est proposé.',
+      'Corruption détectée dans votre corps.',
+      'Vos statistiques ont été mises à jour.',
+      'Une quête secondaire est apparue.',
+      'Le canal de communication est ouvert.',
+      'Le canal de communication a été coupé.',
+      'Avertissement : comportement hors-scénario détecté.',
+      'Sauvegarde impossible.',
+      'Synchronisation en cours…',
+      'Bienvenue, incarnation.',
+    ]},
+    { name:'Approbation', color:'#40e080', items:[
+      '%P apprécie votre façon de faire.',
+      '%P apprécie votre volonté de vous battre.',
+      '%P respecte votre choix.',
+      '%P admire votre détermination.',
+      '%P approuve votre courage.',
+      '%P est impressionnée par vos actions.',
+      '%P reconnaît votre valeur.',
+      '%P apprécie votre instinct.',
+      '%P salue votre sacrifice.',
+      '%P honore votre engagement.',
+      '%P pense que vous êtes sur la bonne voie.',
+      '%P ne s\'attendait pas à autant de résilience.',
+      '%P estime que vous méritez mieux que ce que vous avez.',
+      '%P vous considère désormais comme digne d\'attention.',
+      '%P a changé d\'avis vous concernant.',
+      '%P apprécie la façon dont vous gérez la pression.',
+      '%P reconnaît en vous quelque chose qu\'elle croyait disparu.',
+      '%P pense que vos erreurs passées ne vous définissent pas.',
+      '%P vous accorde sa confiance, provisoirement.',
+      '%P observe votre progression avec une satisfaction croissante.',
+      '%P a transmis votre nom à d\'autres constellations.',
+      '%P a cessé de minimiser vos accomplissements.',
+      '%P considère que vous avez dépassé ses attentes.',
+    ]},
+    { name:'Désapprobation', color:'#ff5060', items:[
+      '%P n\'aime pas votre attitude.',
+      '%P désapprouve votre comportement.',
+      '%P trouve votre choix insensé.',
+      '%P méprise votre faiblesse.',
+      '%P juge votre méthode stupide.',
+      '%P est déçue par vos actions.',
+      '%P condamne votre lâcheté.',
+      '%P n\'approuve pas votre stratégie.',
+      '%P pense que vous avez mal agi.',
+      '%P estime que vous avez failli.',
+      '%P considère que vous n\'avez pas à la hauteur de l\'enjeu.',
+      '%P ne comprend pas comment vous pouvez vous regarder.',
+      '%P a honte pour vous.',
+      '%P pense que vous méritez ce qui vous arrive.',
+      '%P trouve vos excuses pathétiques.',
+      '%P ne vous fait plus confiance.',
+      '%P estime que vous avez trahi quelque chose d\'important.',
+      '%P pense que vous êtes en train de tout gâcher.',
+      '%P a perdu patience.',
+      '%P considère que vous êtes un avertissement pour les autres.',
+      '%P ne croit plus en votre potentiel.',
+      '%P pense que votre destin aurait dû s\'arrêter là.',
+      '%P vous efface mentalement de sa liste.',
+    ]},
+    { name:'Surprise & Choc', color:'#ffcc00', items:[
+      '%P est stupéfaite par votre décision.',
+      '%P est ébranlée par cette révélation.',
+      '%P n\'aurait jamais prévu ce tournant.',
+      '%P est désorientée par votre acte.',
+      '%P réévalue ce qu\'elle croyait savoir.',
+      '%P retient son souffle.',
+      '%P ne comprend pas ce qu\'elle vient de voir.',
+      '%P a besoin d\'un moment pour intégrer ce qui s\'est passé.',
+      '%P n\'a pas de mots.',
+      '%P vient de revoir l\'ensemble de ses prédictions.',
+      '%P n\'avait pas modélisé cette possibilité.',
+      '%P a rarement été aussi déstabilisée.',
+      '%P commence à douter de ses propres analyses.',
+      '%P réalise qu\'elle sous-estimait quelque chose.',
+      '%P n\'avait pas prévu que vous iriez aussi loin.',
+      '%P se demande si les règles s\'appliquent encore à vous.',
+      '%P est silencieuse depuis plusieurs secondes.',
+      '%P vérifie si ce qu\'elle a vu est réel.',
+      '%P ne sait pas encore si c\'est bon ou mauvais signe.',
+      '%P reconsidère toutes ses hypothèses précédentes.',
+    ]},
+    { name:'Amusement & Ironie', color:'#a060ff', items:[
+      '%P trouve la situation ridicule.',
+      '%P trouve la situation amusante.',
+      '%P est divertie par votre attitude.',
+      '%P rit de cette tournure inattendue.',
+      '%P trouve votre logique incompréhensible.',
+      '%P observe avec un plaisir non dissimulé.',
+      '%P apprécie l\'ironie de la situation.',
+      '%P pense que vous n\'êtes pas sérieux.',
+      '%P trouve que vous avez le sens du spectacle.',
+      '%P commence à croire que vous faites ça exprès.',
+      '%P n\'avait pas prévu d\'être divertie aujourd\'hui.',
+      '%P se demande si vous vous rendez compte de ce que vous faites.',
+      '%P apprécie votre façon de transformer le tragique en comédie.',
+      '%P vote pour vous laisser continuer, juste pour voir.',
+      '%P pense que votre existence est une anomalie narrative.',
+      '%P rit, mais pas pour les raisons que vous croyez.',
+      '%P a partagé ce moment avec d\'autres constellations.',
+      '%P n\'avait pas vu quelque chose d\'aussi absurde depuis longtemps.',
+      '%P espère secrètement que ça continue.',
+      '%P se demande si vous avez un sens de l\'humour ou juste de la malchance.',
+    ]},
+    { name:'Curiosité & Intérêt', color:'#00c8ff', items:[
+      '%P est curieuse de la suite.',
+      '%P attend votre prochaine décision.',
+      '%P observe avec intérêt.',
+      '%P suit votre progression attentivement.',
+      '%P note chacun de vos mouvements.',
+      '%P scrute votre potentiel.',
+      '%P se demande jusqu\'où vous irez.',
+      '%P débat de votre avenir.',
+      '%P commence à investir du temps dans votre observation.',
+      '%P a décidé de ne pas intervenir, pour voir.',
+      '%P veut comprendre ce qui vous motive vraiment.',
+      '%P n\'a pas encore compris votre logique, et ça l\'intrigue.',
+      '%P pense que vous êtes plus complexe qu\'il n\'y paraît.',
+      '%P se demande ce que vous feriez sans les contraintes actuelles.',
+      '%P a commencé à constituer un dossier sur vous.',
+      '%P surveille vos interactions avec les autres.',
+      '%P attend de voir comment vous gérez l\'échec.',
+      '%P se demande quelle version de vous émergera de tout ça.',
+      '%P pense que votre histoire n\'est pas terminée.',
+      '%P a identifié quelque chose en vous qu\'elle n\'arrive pas à nommer.',
+      '%P ne parie plus mais continue d\'observer.',
+      '%P veut voir si vous restez cohérent sous pression.',
+    ]},
+    { name:'Combat & Puissance', color:'#ff8030', items:[
+      '%P apprécie votre style de combat.',
+      '%P reconnaît votre puissance.',
+      '%P admire votre sang-froid en bataille.',
+      '%P est étonnée par votre survie.',
+      '%P ne s\'attendait pas à cette victoire.',
+      '%P juge que vous méritez de vivre.',
+      '%P considère que vous avez gagné ce droit.',
+      '%P veut voir jusqu\'où votre force peut aller.',
+      '%P pense que vous avez quelque chose que l\'entraînement ne donne pas.',
+      '%P reconnaît en vous un prédateur potentiel.',
+      '%P commence à vous craindre légèrement.',
+      '%P pense que vos ennemis ont commis une erreur en vous laissant vivre.',
+      '%P n\'avait pas modélisé cette efficacité.',
+      '%P estime que vous avez dépassé vos limites théoriques.',
+      '%P se demande si vous avez accès à quelque chose qu\'elle ne perçoit pas.',
+      '%P a parié sur vous. Elle a eu raison.',
+      '%P pense que votre corps n\'est pas votre seule arme.',
+      '%P considère que vous incarnez quelque chose de rare.',
+      '%P a levé sa limite d\'évaluation pour vous.',
+      '%P pense que vous serez dangereux pour tout le monde, un jour.',
+    ]},
+    { name:'Mépris & Indifférence', color:'#607090', items:[
+      '%P vous ignore totalement.',
+      '%P ne juge pas cela digne d\'intérêt.',
+      '%P estime que vous n\'êtes pas à la hauteur.',
+      '%P considère votre existence insignifiante.',
+      '%P pense que vous finirez comme les autres.',
+      '%P n\'attend rien de particulier de vous.',
+      '%P a déjà oublié votre nom.',
+      '%P ne daigne pas commenter.',
+      '%P ne vous accorde pas de regard.',
+      '%P pense que vous n\'êtes qu\'une distraction.',
+      '%P a des choses plus importantes à observer.',
+      '%P n\'a pas modifié son évaluation depuis le début.',
+      '%P considère que votre survie jusqu\'ici relève du hasard.',
+      '%P estime que vous surestimez votre importance.',
+      '%P n\'a pas retenu votre nom.',
+      '%P pense que vous remplissez une fonction narrative mineure.',
+      '%P vous catalogue comme quantité négligeable.',
+      '%P n\'a aucune prédiction négative ou positive vous concernant.',
+      '%P vous a effacé de ses priorités d\'observation.',
+      '%P ne se souviendra pas de ce moment.',
+    ]},
+    { name:'Peur & Inquiétude', color:'#e040e0', items:[
+      '%P est troublée par ce qu\'elle voit.',
+      '%P redoute ce que vous pourriez devenir.',
+      '%P pressent un danger imminent.',
+      '%P perçoit quelque chose d\'inquiétant en vous.',
+      '%P se demande si cela peut encore être contrôlé.',
+      '%P débat des conséquences de vos actes.',
+      '%P commence à regretter de vous avoir regardé.',
+      '%P pense que vous avancez vers quelque chose d\'irréversible.',
+      '%P ne sait pas comment interpréter ce qu\'elle voit.',
+      '%P estime que vous êtes en train de briser quelque chose.',
+      '%P commence à envisager des scénarios qu\'elle préférait ignorer.',
+      '%P se demande si quelqu\'un devrait intervenir.',
+      '%P a tenté de prédire votre trajectoire. Elle a échoué.',
+      '%P pense que vous êtes un facteur d\'instabilité.',
+      '%P est de moins en moins sûre que vous soyez de leur côté.',
+      '%P a communiqué son inquiétude à d\'autres.',
+      '%P se demande si elle vous a trop regardé.',
+      '%P pense que quelque chose a changé en vous récemment.',
+      '%P n\'est plus certaine que vos actions soient lisibles.',
+      '%P commence à surveiller ceux qui vous entourent autant que vous.',
+    ]},
+    { name:'Récompenses & Dons', color:'#ffd040', items:[
+      '%P vous accorde une récompense spéciale.',
+      '%P vous offre une faveur unique.',
+      '%P a déposé un don dans votre inventaire.',
+      '%P vous parraine officiellement.',
+      '%P vous transmet un fragment de sa puissance.',
+      '%P vous ouvre l\'accès à sa boutique privée.',
+      '%P vous offre un titre provisoire.',
+      '%P vous transmet une information qu\'elle gardait.',
+      '%P vous attribue un bonus de survie.',
+      '%P vous envoie un objet sans explication.',
+      '%P vous accorde une protection temporaire.',
+      '%P vous laisse un choix entre deux dons.',
+      '%P vous donne accès à une ressource rare.',
+      '%P vous cède un avantage sur vos adversaires actuels.',
+      '%P vous fait parvenir quelque chose via un intermédiaire.',
+      '%P efface temporairement votre dette narrative.',
+      '%P vous offre une seconde chance sur un événement passé.',
+      '%P vous transmet quelque chose qu\'elle a attendu longtemps de donner.',
+    ]},
+    { name:'Avertissement', color:'#ff6020', items:[
+      '%P vous avertit que quelque chose arrive.',
+      '%P pense que vous n\'êtes pas prêt pour ce qui vient.',
+      '%P vous conseille de reculer maintenant.',
+      '%P a tenté de vous prévenir. Maintenant c\'est trop tard.',
+      '%P vous signale une menace que vous n\'avez pas vue.',
+      '%P pense que vous allez dans la mauvaise direction.',
+      '%P vous déconseille fortement de continuer.',
+      '%P a vu cette situation se terminer mal avant.',
+      '%P vous suggère de ne pas ouvrir cette porte.',
+      '%P préfère vous prévenir plutôt que de vous regarder échouer.',
+      '%P estime que vos alliés actuels ne sont pas fiables.',
+      '%P vous signale que vous êtes observé par quelque chose de plus grand.',
+      '%P pense que le vrai danger n\'est pas là où vous regardez.',
+      '%P vous conseille de ne faire confiance à personne ce soir.',
+      '%P vous avertit que la règle du jeu a changé.',
+    ]},
+    { name:'Trahison', color:'#cc2060', items:[
+      '%P vous retire son soutien.',
+      '%P a décidé de changer de camp.',
+      '%P considère que votre accord est caduc.',
+      '%P vous informe qu\'elle a transmis vos informations.',
+      '%P pense que vous avez cessé d\'être un investissement rentable.',
+      '%P ne vous protège plus.',
+      '%P a informé vos adversaires de votre position.',
+      '%P a décidé que vous étiez plus utile comme obstacle.',
+      '%P vous retire sa faveur sans explication.',
+      '%P a vendu votre histoire à d\'autres spectateurs.',
+      '%P pense que vous étiez un moyen, pas une fin.',
+      '%P a effacé votre contrat de son registre.',
+      '%P ne répondra plus à vos appels.',
+      '%P a partagé vos faiblesses avec qui voulait les entendre.',
+    ]},
+    { name:'Défi', color:'#e08000', items:[
+      '%P vous lance un défi.',
+      '%P veut voir si vous êtes à la hauteur de votre réputation.',
+      '%P propose une épreuve que vous ne pouvez pas refuser.',
+      '%P pense que vous n\'avez pas encore prouvé votre valeur.',
+      '%P vous met au défi de faire mieux que la dernière fois.',
+      '%P veut savoir ce que vous ferez sous pression maximale.',
+      '%P a créé une situation pour tester vos limites.',
+      '%P pense que vous parlez beaucoup. Elle veut voir.',
+      '%P vous propose un jeu dont elle fixe les règles.',
+      '%P estime que vous avez besoin d\'être poussé.',
+      '%P a placé un obstacle sur votre chemin volontairement.',
+      '%P attend une réponse digne de ce qu\'elle espère.',
+      '%P pense que vous refuserez. Elle espère avoir tort.',
+    ]},
+    { name:'Prophétie', color:'#a0c0ff', items:[
+      '%P a vu quelque chose vous concernant.',
+      '%P prédit que vous ne mourrez pas ici.',
+      '%P annonce que quelque chose va changer très bientôt.',
+      '%P a vu la fin de cette séquence. Elle ne dit pas laquelle.',
+      '%P prédit que vous regretterez ce choix.',
+      '%P annonce que quelqu\'un de proche va disparaître.',
+      '%P a vu une version de vous qu\'elle n\'arrive pas à interpréter.',
+      '%P prédit que votre plus grande menace vient de l\'intérieur.',
+      '%P annonce que les règles vont changer avant la fin.',
+      '%P a vu ce qui arrive à ceux qui font ce que vous faites.',
+      '%P prédit que vous survivrez, mais à quel prix.',
+      '%P annonce que quelque chose que vous croyez mort ne l\'est pas.',
+      '%P a vu un fil narratif se resserrer autour de vous.',
+    ]},
+    { name:'Silence', color:'#404060', items:[
+      '%P a cessé d\'émettre.',
+      '%P ne répond plus.',
+      '%P s\'est retirée de l\'observation.',
+      '%P n\'a plus rien à dire sur vous.',
+      '%P a quitté le réseau de surveillance.',
+      '%P a effacé votre dossier.',
+      '%P ne veut plus être associée à ce qui va arriver.',
+      '%P s\'est tue au moment précis où vous avez agi.',
+      '%P refuse de commenter.',
+      '%P a disparu des registres actifs.',
+      '%P a coupé la connexion avant la fin.',
+      '%P ne regardera pas la suite.',
+    ]},
+    { name:'Contrat', color:'#60e0b0', items:[
+      '%P vous propose un marché.',
+      '%P a une offre que vous devriez considérer.',
+      '%P est prête à vous donner ce que vous voulez. Il y a une condition.',
+      '%P vous propose un échange qui semble trop équilibré pour être honnête.',
+      '%P est prête à oublier vos dettes en échange d\'un service.',
+      '%P vous offre une protection en échange d\'une loyauté partielle.',
+      '%P propose de financer votre prochaine étape contre un droit de regard.',
+      '%P veut quelque chose que vous seul pouvez obtenir.',
+      '%P a rédigé un contrat. Elle attend votre signature.',
+      '%P propose une alliance à durée déterminée.',
+      '%P vous offre ce dont vous avez besoin maintenant. Vous paierez plus tard.',
+      '%P pense que vous avez besoin d\'elle autant qu\'elle a besoin de vous.',
+    ]},
+    { name:'Sponsoring', color:'#ffd040', items:[
+      '%P souhaite devenir le commanditaire de %I.',
+      '%P vous propose son parrainage.',
+      '%P tend la main vers vous depuis l\'autre côté du voile.',
+      '%P a décidé de miser sur %I.',
+      '%P vous offre sa protection — à ses conditions.',
+      '%P grave votre nom dans son registre personnel.',
+      '%P choisit %I comme son incarnation.',
+      '%P murmure : « Montre-moi ce dont tu es capable. »',
+      '%P scelle un pacte de commandite avec %I.',
+      '%P accorde à %I une parcelle de sa puissance.',
+      '%P parie sa réputation sur votre nom.',
+      '%P a sponsorisé %G à %I.',
+      'Une constellation d\'une petite planète a sponsorisé %G à %I.',
+      '%P offre %G de mise initiale à %I.',
+    ]},
+    { name:'Rupture du Lien', color:'#ff3b5c', items:[
+      '%P juge que vous êtes trop faible.',
+      '%P retire son parrainage sans un mot de plus.',
+      '%P coupe le lien qui vous unissait.',
+      '%P détourne son regard de vous, définitivement.',
+      '%P efface votre nom de son registre.',
+      '%P estime que vous ne méritez plus son attention.',
+      '%P vous abandonne à votre sort.',
+      '%P rompt le pacte : vous l\'avez déçue.',
+      '%P retire la puissance qu\'elle vous avait prêtée.',
+      '« Tu n\'étais pas digne », souffle %P avant de disparaître.',
+      '%P cesse de parier sur une cause perdue.',
+    ]},
+    { name:'Régression Détectée', color:'#b96bff', items:[
+      '%P perçoit une anomalie qu\'elle ne parvient pas à nommer.',
+      '%P a l\'étrange impression de revivre cet instant.',
+      'Quelque chose cloche, et %P le sent sans le comprendre.',
+      '%P frémit : votre savoir dépasse ce que vous devriez connaître.',
+      '%P vous observe avec une méfiance soudaine et inexplicable.',
+      '%P ne comprend pas comment vous avez pu anticiper cela.',
+      'Un frisson parcourt %P, comme un souvenir qui n\'existe pas.',
+      '%P jurerait vous avoir déjà vu mourir.',
+      '%P flaire une trame qui ne devrait pas exister.',
+      '%P interroge le vide : qui êtes-vous réellement ?',
+    ]},
+    { name:'Régresseur Démasqué', color:'#8b3bff', items:[
+      '%P a compris ce que vous êtes. Vous êtes en danger de mort.',
+      '%P connaît désormais votre secret.',
+      '%P a percé le voile : vous êtes un régresseur.',
+      '%P sait. Et ce qu\'elle sait peut vous tuer pour de bon.',
+      '%P contemple en vous une menace pour l\'ordre des récits.',
+      '%P hésite : vous dénoncer, ou vous exploiter ?',
+      '%P a vu la couture de votre mensonge temporel.',
+    ]},
+    { name:'L\'Abysse Observe', color:'#5fffc8', items:[
+      'Quelque chose d\'immense et d\'indifférent a posé les yeux sur vous.',
+      '%P se tait : une présence bien plus vaste vient d\'apparaître.',
+      'Un Dieu Extérieur a remarqué votre existence.',
+      'Le voile se déchire. Quelque chose regarde à travers.',
+      'Une faim sans pensée s\'est tournée vers vous.',
+      'Les constellations elles-mêmes reculent devant ce qui vient.',
+      'Ce qui rampe entre les lignes connaît maintenant votre nom.',
+    ]},
+    { name:'Pari & Enjeux', color:'#34d0ff', items:[
+      '%P parie %G sur la survie de %I.',
+      '%P mise contre %I.',
+      '%P double sa mise sur %I.',
+      '%P observe la cote grimper en votre faveur.',
+      '%P a tout misé sur la prochaine décision de %I.',
+      '%P retire prudemment ses jetons de la table.',
+      'Les paris s\'envolent autour de votre nom.',
+      '%P jubile : sa mise sur vous vient de tripler.',
+    ]},
+    { name:'Faveur & Gold', color:'#ffc933', items:[
+      '%P fait don de %G à %I.',
+      '%P déverse une pluie de %G en l\'honneur de %I.',
+      '%P récompense l\'exploit de %I avec largesse : %G.',
+      '%P ajoute une faveur à votre nom.',
+      '%P offre à %I un présent venu d\'au-delà des étoiles.',
+      '%P juge votre prestation digne d\'un don rare.',
+      '%P transmet une relique à votre intention.',
+    ]},
+    { name:'Encouragement', color:'#52e08a', items:[
+      '%P vous exhorte à continuer.',
+      '%P croit en vous.',
+      '%P vous presse de tenir bon.',
+      '%P vous souffle de ne pas renoncer.',
+      '%P place en vous une confiance renouvelée.',
+      '%P vous rappelle ce pour quoi vous vous battez.',
+      '%P attend de vous de grandes choses.',
+    ]},
+    { name:'Système — Scénarios', color:'#9ec0ff', items:[
+      'Le scénario principal commence.',
+      'Le scénario principal n°1 commence.',
+      'Un nouveau scénario principal est arrivé.',
+      'Un scénario caché a été découvert.',
+      'Le scénario secondaire a été mis à jour.',
+      'Conditions de réussite modifiées.',
+      'Le compte à rebours du scénario a démarré.',
+      'Il reste 10 minutes avant la fin du scénario.',
+      'Le scénario a été prolongé par décision des constellations.',
+      'Scénario accompli. Calcul des récompenses en cours…',
+      'Le scénario a échoué. Application des pénalités…',
+      'Vous avez quitté la zone du scénario. Retournez-y immédiatement.',
+      'Un scénario d\'urgence a été déclenché dans votre secteur.',
+      'Le Bureau a suspendu le scénario en cours.',
+      'Le scénario interdit a été signalé au Bureau.',
+      'Une cible a été désignée. La traque commence.',
+      'Le scénario mondial est ouvert à tous les incarnés.',
+      'Vous êtes entré dans un scénario dont vous ne connaissez pas les règles.',
+      'Le récit se réécrit. Veuillez patienter.',
+    ]},
+    { name:'Système — Pièces & Parrainage', color:'#ffd77a', items:[
+      'Vous avez reçu %G.',
+      'Une constellation vous a sponsorisé %G.',
+      'Une constellation d\'une petite planète a sponsorisé %G à %I.',
+      'Le total de vos pièces a été mis à jour.',
+      'Votre solde est insuffisant pour cette transaction.',
+      'Un canal de sponsoring a été ouvert.',
+      'Un canal de sponsoring a été fermé.',
+      'Une constellation demande à devenir votre commanditaire.',
+      'Le contrat de parrainage a été signé.',
+      'Le contrat de parrainage a été rompu.',
+      'Une faveur a été ajoutée à votre nom.',
+      'Une dette narrative a été inscrite à votre nom.',
+      'Le Marché des Récits vous est désormais accessible.',
+      'Vous avez acheté un objet dans la boutique du Dokkaebi.',
+    ]},
+    { name:'Système — Observation', color:'#c8b8ff', items:[
+      'Une constellation vous observe.',
+      'Un certain nombre de constellations vous observent.',
+      'De nombreuses constellations retiennent leur souffle.',
+      'Toutes les constellations se sont tues.',
+      'Plusieurs constellations sont entrées dans le canal.',
+      'Les constellations débattent de votre sort.',
+      'Un canal indirect a été ouvert par une constellation.',
+      'Une constellation vous adresse un message indirect.',
+      'Une constellation a quitté le canal.',
+      'Une constellation a masqué son modificateur.',
+      'Un modificateur inconnu est apparu dans le canal.',
+      'Quelqu\'un lit votre histoire.',
+    ]},
+    { name:'Système — Compétences & Attributs', color:'#7ff0d0', items:[
+      'Compétence exclusive acquise.',
+      'Le niveau de votre compétence a augmenté.',
+      'Une compétence a atteint son plein potentiel.',
+      'Vous avez obtenu un fragment d\'histoire.',
+      'Attribut mis à jour : Force.',
+      'Attribut mis à jour : Perception.',
+      'Votre modificateur a évolué.',
+      'Un nouveau titre vous a été attribué.',
+      'Votre titre a été retiré.',
+      'Le sceau du Récit s\'est activé.',
+      'Votre corps n\'a pas supporté la charge. Régénération en cours…',
+      'Vous avez utilisé une compétence interdite. Le Bureau en a été informé.',
+    ]},
+    { name:'Système — Alertes', color:'#ff8a5a', items:[
+      'Avertissement : votre probabilité de survie a chuté.',
+      'Danger : un incarné de rang supérieur approche.',
+      'Une entité non répertoriée a été détectée.',
+      'Le voile s\'amincit dans cette zone.',
+      'Corruption narrative détectée. Purge recommandée.',
+      'Le régresseur a été localisé.',
+      'Vous êtes surveillé par le Bureau.',
+      'Attention : boucle temporelle instable.',
+      'Le chronomètre du monde s\'est arrêté.',
+      'Une anomalie a été effacée des registres.',
+      'Ce message n\'aurait pas dû vous parvenir.',
+    ]},
+    { name:'✶ Narrateurs', color:'#e0e8ff', items:[
+      '%P tourne une page que vous n\'aviez pas écrite.',
+      '%P murmure que ce chapitre lui plaît.',
+      '%P trouve votre récit digne d\'être conservé.',
+      '%P corrige une virgule dans votre destin.',
+      '%P referme le livre. Pour l\'instant.',
+      '%P note que vous n\'êtes pas le protagoniste qu\'elle attendait.',
+      '%P pense que la fin est encore ouverte.',
+      '%P souligne ce passage. Il comptera plus tard.',
+      '%P cherche votre nom à la table des matières.',
+      '%P déchire une page que vous auriez préféré garder.',
+    ]},
+    { name:'☀ Bien', color:'#ffd060', items:[
+      '%P bénit votre chemin.',
+      '%P est émue par votre compassion.',
+      '%P vous accorde sa lumière.',
+      '%P protège ceux que vous avez épargnés.',
+      '%P vous rappelle que la miséricorde a un prix, et qu\'elle le paiera avec vous.',
+      '%P applaudit votre refus de céder à la haine.',
+      '%P veille sur vos blessés.',
+      '%P pleure ceux que vous n\'avez pas pu sauver.',
+      '%P espère que vous resterez ce que vous êtes.',
+      '%P vous confie une part de son espoir.',
+      '%P est déçue : la lumière en vous vacille.',
+    ]},
+    { name:'☠ Mal', color:'#ff4050', items:[
+      '%P savoure votre cruauté.',
+      '%P se réjouit de votre chute.',
+      '%P vous invite à aller plus loin.',
+      '%P rit devant les corps que vous laissez.',
+      '%P vous propose un pouvoir qui ne se rend pas.',
+      '%P trouve votre pitié répugnante.',
+      '%P admire la propreté de votre trahison.',
+      '%P veut voir jusqu\'où votre colère peut brûler.',
+      '%P vous rappelle que personne ne viendra vous sauver.',
+      '%P grave votre nom sur sa liste de favoris.',
+      '%P s\'ennuie : vous hésitez encore.',
+    ]},
+    { name:'✷ Chaos', color:'#ff8030', items:[
+      '%P jubile devant ce désordre.',
+      '%P applaudit l\'imprévisible.',
+      '%P renverse la table pour voir ce qui tombe.',
+      '%P a lancé un dé. Vous êtes le résultat.',
+      '%P trouve les règles ennuyeuses, et vous aussi.',
+      '%P propose de tout recommencer, mais à l\'envers.',
+      '%P rit d\'un plan qui vient d\'échouer — le sien ou le vôtre, peu importe.',
+      '%P glisse une variable dans votre équation.',
+      '%P espère que vous ne savez pas ce que vous faites.',
+      '%P déteste quand ça se passe comme prévu.',
+    ]},
+    { name:'☩ Mort', color:'#9040b0', items:[
+      '%P compte les secondes qu\'il vous reste.',
+      '%P a déjà réservé votre place.',
+      '%P trouve votre survie indécente.',
+      '%P vous rappelle que tout ce que vous aimez finira.',
+      '%P s\'incline devant ceux que vous avez fauchés.',
+      '%P vous laisse partir. Cette fois.',
+      '%P n\'a pas encore prononcé votre nom.',
+      '%P recueille les derniers mots de vos ennemis.',
+      '%P apprécie la dignité de votre fin, si elle vient.',
+      '%P referme les yeux d\'un allié pour vous.',
+    ]},
+    { name:'⧗ Temps', color:'#60a8e0', items:[
+      '%P a déjà vu cet instant.',
+      '%P constate que vous êtes en retard sur votre destin.',
+      '%P remonte une seconde pour mieux vous regarder.',
+      '%P sait combien de fois vous avez échoué ici.',
+      '%P vous accorde une pause. Elle ne durera pas.',
+      '%P s\'inquiète : la boucle se resserre.',
+      '%P trouve que vous vieillissez trop vite pour cette histoire.',
+      '%P vous rappelle que l\'avenir se souvient de vous.',
+      '%P efface un futur qui ne vous aurait pas plu.',
+      '%P se demande quelle version de vous survivra.',
+    ]},
+    { name:'◐ Ambiguës', color:'#a0a0b0', items:[
+      '%P ne dit ni oui ni non.',
+      '%P pèse votre acte sans le juger.',
+      '%P pense que le bien et le mal ne sont pas la question.',
+      '%P attend de voir ce que vous ferez de cette victoire.',
+      '%P vous trouve intéressant, sans savoir pourquoi.',
+      '%P change de camp aussi souvent que vous.',
+      '%P sourit d\'un côté du visage seulement.',
+      '%P ne parie pas. Elle regarde.',
+      '%P pense que vous vous mentez à vous-même. Elle approuve.',
+      '%P ne vous doit rien et vous ne lui devez rien. Pour l\'instant.',
+    ]},
+    { name:'⚖ Marchands', color:'#ffc94a', items:[
+      '%P estime la valeur de votre âme à la hausse.',
+      '%P vous propose un prix pour cette relique.',
+      '%P note que vous dépensez trop vite.',
+      '%P rappelle que tout s\'achète, y compris le silence.',
+      '%P ouvre son étal. Regardez, mais ne touchez pas.',
+      '%P vous accorde un crédit. Les intérêts sont narratifs.',
+      '%P vous fait une remise : elle vous aime bien.',
+      '%P double ses tarifs : elle vous aime bien aussi.',
+      '%P pense que vous n\'avez pas les moyens de refuser.',
+      '%P inscrit votre dette dans son grand livre.',
+    ]},
+    { name:'◬ L\'Abysse & le Grouillement', color:'#5fffc8', items:[
+      '%P n\'a pas de visage, mais elle vous regarde.',
+      '%P bruisse derrière le voile.',
+      '%P a compté vos os.',
+      '%P trouve votre monde délicieusement fragile.',
+      '%P ne comprend pas vos mots, mais elle comprend votre peur.',
+      '%P s\'étire. Le récit craque.',
+      '%P glisse une pensée qui n\'est pas la vôtre dans votre esprit.',
+      '%P attend que les étoiles s\'éteignent.',
+      '%P a laissé quelque chose en vous.',
+    ]},
+    { name:'Hostilité Ouverte', color:'#ff2e4d', items:[
+      '%P vous a pris en grippe.',
+      '%P souhaite ouvertement votre échec.',
+      '%P complote contre vous.',
+      '%P a juré votre perte.',
+      '%P dresse des obstacles sur votre route.',
+      '%P attise vos ennemis.',
+      '%P ne cache plus son désir de vous voir tomber.',
+    ]},
+  ];
+}
+const THEME_GROUPS = [
+  { label:'Rouges', themes:[
+    {id:'rouge',color:'#d42020',label:'Rouge'},
+    {id:'cramoisi',color:'#920018',label:'Cramoisi'},
+    {id:'sang',color:'#480008',label:'Sang'},
+  ]},
+  { label:'Oranges & Jaunes', themes:[
+    {id:'orange-alerte',color:'#b83c00',label:'Orange Alerte'},
+    {id:'orange',color:'#cc5800',label:'Orange'},
+    {id:'jaune',color:'#cc9e00',label:'Jaune'},
+    {id:'or',color:'#906800',label:'Or Royal'},
+  ]},
+  { label:'Verts', themes:[
+    {id:'vert',color:'#18a030',label:'Vert'},
+    {id:'toxique',color:'#008800',label:'Toxique'},
+    {id:'emeraude',color:'#005c38',label:'Émeraude'},
+  ]},
+  { label:'Bleus & Cyans', themes:[
+    {id:'cyan',color:'#00b8cc',label:'Cyan'},
+    {id:'bleu',color:'#1e7ae8',label:'Bleu'},
+    {id:'bleu-roi',color:'#141c80',label:'Bleu Roi'},
+    {id:'turquoise',color:'#009278',label:'Turquoise'},
+    {id:'acier',color:'#2a3440',label:'Acier'},
+  ]},
+  { label:'Violets & Roses', themes:[
+    {id:'violet',color:'#2a0080',label:'Violet Spatial'},
+    {id:'violet-doux',color:'#5820b8',label:'Violet Doux'},
+    {id:'plasma',color:'#440070',label:'Plasma'},
+    {id:'nebula',color:'#241050',label:'Nébula'},
+    {id:'rose',color:'#d820a0',label:'Rose'},
+  ]},
+  { label:'Neutres', themes:[
+    {id:'blanc',color:'#888898',label:'Blanc'},
+    {id:'noir',color:'#181818',label:'Noir'},
+  ]},
+];
+const PL_IRR = {
+  "est":"sont","a":"ont","fait":"font","sait":"savent","va":"vont","veut":"veulent","peut":"peuvent",
+  "vient":"viennent","tient":"tiennent","retient":"retiennent","attend":"attendent","entend":"entendent",
+  "tend":"tendent","comprend":"comprennent","prend":"prennent","apprend":"apprennent","transmet":"transmettent",
+  "met":"mettent","promet":"promettent","rompt":"rompent","suit":"suivent","dit":"disent","prédit":"prédisent",
+  "croit":"croient","voit":"voient","perçoit":"perçoivent","reçoit":"reçoivent","doit":"doivent",
+  "connaît":"connaissent","reconnaît":"reconnaissent","paraît":"paraissent","rit":"rient","sourit":"sourient",
+  "choisit":"choisissent","frémit":"frémissent","avertit":"avertissent","réagit":"réagissent","jouit":"jouissent",
+  "avait":"avaient","était":"étaient","aurait":"auraient","serait":"seraient","devrait":"devraient",
+  "pourrait":"pourraient","jurerait":"jureraient","croyait":"croyaient","gardait":"gardaient",
+  "préférait":"préféraient","attendait":"attendaient","arrive":"arrivent","parvient":"parviennent",
+  "débat":"débattent","vaut":"valent","vend":"vendent","offre":"offrent","ouvre":"ouvrent","couvre":"couvrent",
+  "sert":"servent","part":"partent","sent":"sentent","pressent":"pressentent","ment":"mentent","défend":"défendent",
+  "descend":"descendent","bénit":"bénissent","applaudit":"applaudissent","réjouit":"réjouissent","punit":"punissent","nourrit":"nourrissent","finit":"finissent","obéit":"obéissent","réfléchit":"réfléchissent","agit":"agissent","gémit":"gémissent","fleurit":"fleurissent","interrompt":"interrompent","poursuit":"poursuivent","écrit":"écrivent","inscrit":"inscrivent"
+};
+const PL_ADJ = ["curieuse","divertie","désorientée","déçue","impressionnée","prête","retirée","silencieuse",
+  "stupéfaite","troublée","tue","ébranlée","étonnée","seule","fière","satisfaite","convaincue","attentive",
+  "partagée","divisée","unanime","hostile","inquiète","furieuse","lassée","amusée","fascinée","intriguée","certaine"];
+function plVerb(v){
+  const low=v.toLowerCase();
+  if(PL_IRR[low]!==undefined){
+    const p=PL_IRR[low];
+    return v[0]===v[0].toUpperCase() ? p.charAt(0).toUpperCase()+p.slice(1) : p;
+  }
+  if(/e$/.test(low)) return v+'nt';
+  return v;
+}
+function conjChunk(txt){
+  /* Verbe(s) en tête d'énoncé (le sujet %P est pluriel) */
+  txt = txt.replace(/^((?:ne\s+|n['\u2019]|se\s+|s['\u2019]|vous\s+|lui\s+|en\s+|y\s+)*)([A-Za-zÀ-ÿ'\u2019]+)/,
+    function(_,pre,verb){
+      if(/^["«“(\[]/.test(verb)) return pre+verb;
+      if(verb==='Quelque'||verb==='Un'||verb==='Une') return pre+verb;
+      return pre+plVerb(verb);
+    });
+  /* elle → elles + verbe suivant */
+  txt = txt.replace(/\belle-même\b/g,'elles-mêmes').replace(/\belle\b/g,'elles');
+  txt = txt.replace(/\belles\s+((?:ne\s+|n['\u2019])?)(vous\s+|lui\s+|se\s+|s['\u2019])?([a-zà-ÿ'\u2019]+)/g,
+    function(_,neg,pr,verb){ return 'elles '+neg+(pr||'')+plVerb(verb); });
+  /* possessifs du sujet */
+  txt = txt.replace(/s(['\u2019])sont\b/g,'se sont');
+  txt = txt.replace(/\bsa\s+propre\b/g,'leur propre')
+           .replace(/\bsa\b/g,'leur').replace(/\bson\b/g,'leur').replace(/\bses\b/g,'leurs');
+  /* accords après sont / se sont */
+  PL_ADJ.forEach(a=>{
+    txt = txt.replace(new RegExp('\\b(sont|sont pas|restent)\\s+'+a+'\\b','g'), '$1 '+a+'s');
+  });
+  txt = txt.replace(/\bse sont (tue|retirée|divisée|partagée|ébranlée|étonnée)\b/g,'se sont $1s');
+  return txt;
+}
+function conjPl(body){
+  /* protège les citations « ... » */
+  return body.split(/(«[^»]*»)/).map(function(part,i){
+    return (i%2===1) ? part : conjChunk(part);
+  }).join('');
+}
+
+/* ════════════════════════════════════════════════════
+   ÉTAT & PONT AVEC FOUNDRY
+════════════════════════════════════════════════════ */
+const EMBED = (window.parent && window.parent !== window);
+const LS = { registry:'nm_registry', library:'nm_library', defaults:'nm_defaults', history:'nm_history' };
+const SOUND_LIST = [
+  {id:'',label:'Aucun son'},
+  {id:'neutre',label:'Neutre — double ding'},{id:'systeme',label:'Système — blips'},{id:'doux',label:'Doux — nappe tendre'},{id:'cloche',label:'Cloche — un coup'},
+  {id:'upbeat',label:'Upbeat — arpège brillant'},{id:'victoire',label:'Victoire — fanfare'},{id:'mystique',label:'Mystique — cristal'},
+  {id:'alerte',label:'Alerte — bips alternés'},{id:'danger',label:'Danger — buzz descendant'},{id:'echec',label:'Échec — deux notes graves'},
+  {id:'ominous',label:'Ominous — nappe grave'},{id:'sombre',label:'Sombre — cloche dissonante'},{id:'abysse',label:'Abysse — voix du vide'},{id:'tambour',label:'Tambour — timbale'},{id:'glitch',label:'Glitch — rafales'},
+  {id:'custom',label:'Fichier personnalisé…'}
+];
+let REGISTRY = { folders:[], constellations:[] };
+let LIBRARY  = { cats:[], presets:[] };          /* cats: [{name,color,items[]}] créées par le MJ */
+let HISTORY  = [];
+let USERS    = [];                                /* [{id,name,color,active,isGM}] */
+let currentFont='system';   /* currentMode / currentTheme / currentTmpl : déclarés dans le bloc de données */
+let customVars=null;
+let targets = 'all';                              /* 'all' | Set(ids) */
+
+function send(type, data){ if(EMBED) window.parent.postMessage(Object.assign({type}, data||{}), '*'); }
+function lsGet(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+
+function seedRegistry(){
+  if(!REGISTRY.folders) REGISTRY.folders=[];
+  if(!REGISTRY.constellations) REGISTRY.constellations=[];
+  if(!REGISTRY.seedV){
+    const fIds=new Set(REGISTRY.folders.map(f=>f.id));
+    SEED_FOLDERS.forEach(f=>{ if(!fIds.has(f.id)) REGISTRY.folders.push(JSON.parse(JSON.stringify(f))); });
+    const cIds=new Set(REGISTRY.constellations.map(c=>c.id));
+    SEED_CONSTS.forEach(c=>{ if(!cIds.has(c.id)) REGISTRY.constellations.push(JSON.parse(JSON.stringify(c))); });
+    REGISTRY.seedV=1; saveRegistry();
+  }
+}
+function saveRegistry(){ if(EMBED) send('nm-save',{key:'registry',value:REGISTRY}); else lsSet(LS.registry,REGISTRY); }
+function saveLibrary(){ if(EMBED) send('nm-save',{key:'library',value:LIBRARY}); else lsSet(LS.library,LIBRARY); }
+function saveDefaults(){ const d=collectSettings(); if(EMBED) send('nm-save',{key:'defaults',value:d}); else lsSet(LS.defaults,d); }
+
+/* ── réglages de diffusion (lecture / écriture des champs) ── */
+const $ = id => document.getElementById(id);
+function collectSettings(){
+  return {
+    theme: currentTheme, cMain: $('c-main').value, cGlow: $('c-glow').value, font: currentFont,
+    duration: +$('opt-duration').value||0, dismiss: $('opt-dismiss').checked, position: $('opt-position').value,
+    width: +$('opt-width').value||760, zoom: +$('opt-zoom').value||100, chat: $('opt-chat').checked,
+    sound: $('opt-sound').value, soundPath: $('opt-soundpath').value.trim(), volume: +$('opt-volume').value,
+    cattag: $('opt-cattag').checked, top: $('opt-top').value, bot: $('opt-bot').value, gmToo: $('opt-gmtoo').checked
+  };
+}
+function applySettings(s, keepMsg){
+  if(!s) return;
+  if(s.cMain) $('c-main').value=s.cMain; if(s.cGlow) $('c-glow').value=s.cGlow;
+  if(s.theme) setTheme(s.theme, true);
+  if(s.font){ currentFont=s.font; $('inp-font').value=s.font; applyFontClass(); }
+  if(s.duration!=null){ $('opt-duration').value=s.duration; $('opt-duration-r').value=Math.min(60,s.duration); }
+  if(s.dismiss!=null) $('opt-dismiss').checked=!!s.dismiss;
+  if(s.position) $('opt-position').value=s.position;
+  if(s.width) $('opt-width').value=s.width; if(s.zoom) $('opt-zoom').value=s.zoom;
+  if(s.chat!=null) $('opt-chat').checked=!!s.chat;
+  if(s.sound!=null) $('opt-sound').value=s.sound; if(s.soundPath!=null) $('opt-soundpath').value=s.soundPath;
+  if(s.volume!=null){ $('opt-volume').value=s.volume; $('vol-lbl').textContent=s.volume; }
+  if(s.cattag!=null) $('opt-cattag').checked=!!s.cattag;
+  if(s.top!=null) $('opt-top').value=s.top; if(s.bot!=null) $('opt-bot').value=s.bot;
+  if(s.gmToo!=null) $('opt-gmtoo').checked=!!s.gmToo;
+  onSoundChange(); updateBars(); updateCatTag();
+}
+function syncDur(v){ $('opt-duration').value=v; }
+function onSoundChange(){ $('grp-soundpath').style.display = $('opt-sound').value==='custom' ? '' : 'none'; }
+function updateBars(){ $('p-top').textContent=$('opt-top').value||'SYS::CONSTELLATION_LINK'; $('p-bot').textContent=$('opt-bot').value||' '; }
+function updateImage(){ const v=$('opt-image').value.trim(); const im=$('p-img'); if(v){ im.src=v; im.style.display='block'; } else { im.removeAttribute('src'); im.style.display='none'; } }
+function pick(what){ if(EMBED) send('nm-pick',{what}); else alert('Sélecteur de fichier disponible uniquement dans Foundry.'); }
+function previewSound(){ const s=collectSettings(); if(!s.sound) return; if(EMBED) send('nm-preview',{sound:s.sound, soundPath:s.soundPath, volume:s.volume}); else { const a=new Audio(s.sound==='custom'?s.soundPath:('../sounds/'+s.sound+'.ogg')); a.volume=s.volume/100; a.play().catch(()=>{}); } }
+
+/* ── cibles ── */
+function renderUsers(){
+  const box=$('tg-users'); box.innerHTML='';
+  USERS.filter(u=>!u.isGM).forEach(u=>{
+    const b=document.createElement('button'); b.className='tg-btn'+(u.active?'':' off')+(targets!=='all'&&targets.has(u.id)?' active':'');
+    b.style.setProperty('--uc',u.color||'#38e0ff'); b.title=u.active?'Connecté':'Hors ligne (recevra la copie chat uniquement)';
+    b.innerHTML='<span class="udot"></span>'+esc(u.name); b.onclick=()=>toggleTarget(u.id); box.appendChild(b);
+  });
+  $('tg-all').classList.toggle('active', targets==='all');
+  const n = USERS.filter(u=>!u.isGM&&u.active).length;
+  $('cast-sys').textContent = n ? (n+' JOUEUR'+(n>1?'S':'')+' EN LIGNE') : 'AUCUN JOUEUR EN LIGNE';
+}
+function setAllTargets(){ targets='all'; renderUsers(); }
+function toggleTarget(id){ if(targets==='all') targets=new Set(); if(targets.has(id)) targets.delete(id); else targets.add(id); if(!targets.size) targets='all'; renderUsers(); }
+function askTokenOwners(){ if(EMBED) send('nm-tokens'); }
+function setTargets(ids){ if(!ids||!ids.length){ hint('Aucun token sélectionné (ou aucun joueur propriétaire).'); return; } targets=new Set(ids); renderUsers(); }
+function hint(t){ const h=$('cast-hint'); h.textContent=t; clearTimeout(hint._t); hint._t=setTimeout(()=>{ h.textContent=''; },5000); }
+
+/* ════════════════════════════════════════════════════
+   THÈMES
+════════════════════════════════════════════════════ */
+function buildThemes(){
+  const container=$('theme-groups');
+  THEME_GROUPS.forEach(g=>{
+    const row=document.createElement('div'); row.innerHTML='<div class="theme-group-lbl">'+g.label+'</div>';
+    const btnRow=document.createElement('div'); btnRow.className='theme-row';
+    g.themes.forEach(t=>{ const btn=document.createElement('button'); btn.className='theme-btn'; btn.title=t.label; btn.id='tbtn-'+t.id; btn.style.background=t.color; btn.style.boxShadow='0 0 8px '+t.color+'88'; btn.onclick=()=>setTheme(t.id); btnRow.appendChild(btn); });
+    row.appendChild(btnRow); container.appendChild(row);
+  });
+}
+function allThemeIds(){ const ids=[]; THEME_GROUPS.forEach(g=>g.themes.forEach(t=>ids.push(t.id))); return ids; }
+function themeColor(id){ if(id==='custom') return $('c-main').value; for(const g of THEME_GROUPS) for(const t of g.themes) if(t.id===id) return t.color; return '#1e7ae8'; }
+function themeLabel(id){ if(id==='custom') return 'Personnalisée'; for(const g of THEME_GROUPS) for(const t of g.themes) if(t.id===id) return t.label; return id; }
+function setTheme(id, silent){
+  allThemeIds().forEach(t=>document.body.classList.remove('theme-'+t));
+  const card=$('card');
+  if(id==='custom'){ customVars=nmCustomVars($('c-main').value,$('c-glow').value); for(const k in customVars) card.style.setProperty(k,customVars[k]); }
+  else { customVars=null; Object.keys(nmCustomVars('#000')).forEach(k=>card.style.removeProperty(k)); document.body.classList.add('theme-'+id); }
+  currentTheme=id;
+  document.querySelectorAll('.theme-btn').forEach(b=>b.classList.remove('active'));
+  const btn=$('tbtn-'+id); if(btn) btn.classList.add('active');
+  if(!silent) saveDefaultsSoon();
+}
+function onCustomColor(){ setTheme('custom'); }
+let _sdT=null; function saveDefaultsSoon(){ clearTimeout(_sdT); _sdT=setTimeout(saveDefaults,600); }
+
+/* ── préréglages ── */
+function renderPresets(){
+  const box=$('preset-list'); box.innerHTML='';
+  if(!LIBRARY.presets.length){ box.innerHTML='<div class="reg-empty" style="padding:10px">Aucun préréglage</div>'; return; }
+  LIBRARY.presets.forEach(p=>{
+    const d=document.createElement('div'); d.className='preset-item';
+    const col = p.s.theme==='custom' ? p.s.cMain : themeColor(p.s.theme);
+    d.innerHTML='<span class="pdot" style="background:'+col+';box-shadow:0 0 6px '+col+'"></span><span class="pn">'+esc(p.name)+'</span><span class="ps">'+esc(themeLabel(p.s.theme))+' · '+esc((SOUND_LIST.find(x=>x.id===p.s.sound)||{}).label||'—').split(' —')[0]+' · '+(p.s.duration||'∞')+'s</span><button class="pdel" title="Supprimer">✕</button>';
+    d.onclick=()=>{ applySettings(p.s); hint('Préréglage « '+p.name+' » chargé.'); saveDefaultsSoon(); };
+    d.querySelector('.pdel').onclick=(e)=>{ e.stopPropagation(); LIBRARY.presets=LIBRARY.presets.filter(x=>x!==p); saveLibrary(); renderPresets(); };
+    box.appendChild(d);
+  });
+}
+function savePreset(){
+  const name=$('preset-name').value.trim(); if(!name) return hint('Donne un nom au préréglage.');
+  const s=collectSettings(); const ex=LIBRARY.presets.find(p=>p.name.toLowerCase()===name.toLowerCase());
+  if(ex) ex.s=s; else LIBRARY.presets.push({name, s});
+  saveLibrary(); renderPresets(); $('preset-name').value=''; hint('Préréglage enregistré.');
+}
+
+/* ════════════════════════════════════════════════════
+   MODES / REGISTRE (identique à l'outil d'origine)
+════════════════════════════════════════════════════ */
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function buildCatSelect(){
+  const sel=$('inp-catmode'); let html=''; let fam='';
+  CAT_DEFS.forEach(c=>{ if(c.fam!==fam){ if(fam) html+='</optgroup>'; fam=c.fam; html+='<optgroup label="'+fam+'s">'; } html+='<option value="'+c.id+'">'+c.ic+' '+c.nom+'</option>'; });
+  sel.innerHTML=html+'</optgroup>';
+  const mf=$('mf-cat'); let h2=''; fam='';
+  CAT_DEFS.forEach(c=>{ if(c.fam!==fam){ if(fam) h2+='</optgroup>'; fam=c.fam; h2+='<optgroup label="── '+fam+'s ──">'; } h2+='<option value="'+esc(c.nom)+'">'+esc(c.nom)+'</option>'; });
+  mf.innerHTML=h2+'</optgroup>';
+}
+function buildModes(){
+  const row=$('mode-row');
+  MODES.forEach(m=>{ const btn=document.createElement('button'); btn.className='mode-btn'+(m.id===currentMode?' active':''); btn.id='mbtn-'+m.id; btn.textContent=m.label; btn.onclick=()=>setMode(m.id); row.appendChild(btn); });
+}
+function setMode(id){
+  currentMode=id; document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  const btn=$('mbtn-'+id); if(btn) btn.classList.add('active');
+  const m=MODES.find(x=>x.id===id); $('cats-sub').textContent='Mode : '+(m?m.label:'');
+  const isCat=(id==='categorie'); $('grp-name').style.display=isCat?'none':''; $('grp-cat').style.display=isCat?'':'none';
+  buildCatsUI(); if(currentTmpl) applyTemplate(currentTmpl);
+}
+function renderRegistry(){
+  const query=($('reg-search').value||'').toLowerCase(); const body=$('reg-body');
+  if(!REGISTRY.folders.length){ body.innerHTML='<div class="reg-empty">Aucun dossier — cliquez sur "+ Dossier" pour commencer</div>'; return; }
+  const folders=[...REGISTRY.folders].sort((a,b)=>a.name.localeCompare(b.name)); body.innerHTML='';
+  folders.forEach(folder=>{
+    const consts=REGISTRY.constellations.filter(c=>c.folderId===folder.id).filter(c=>!query||c.name.toLowerCase().includes(query)).sort((a,b)=>a.name.localeCompare(b.name));
+    if(query&&!consts.length) return;
+    const color=CAT_COLORS[folder.cat]||'#8090ff';
+    const div=document.createElement('div'); div.className='reg-folder';
+    div.innerHTML=`<div class="reg-folder-hdr"><div class="reg-folder-dot" style="background:${color};box-shadow:0 0 6px ${color}88"></div><div class="reg-folder-name" style="color:${color}">${esc(folder.name)}</div><div class="reg-folder-cat" style="color:${color}">${esc(folder.cat)}</div><div class="reg-folder-count">${consts.length}</div><button class="reg-folder-del" title="Supprimer">✕</button><div class="reg-folder-arrow">▶</div></div><div class="reg-folder-body ${query?'open':''}"></div>`;
+    const hdr=div.querySelector('.reg-folder-hdr'), fbody=div.querySelector('.reg-folder-body'), arrow=div.querySelector('.reg-folder-arrow');
+    hdr.onclick=()=>{ fbody.classList.toggle('open'); arrow.classList.toggle('open'); };
+    div.querySelector('.reg-folder-del').onclick=(e)=>{ e.stopPropagation(); confirmBox('Supprimer le dossier « '+folder.name+' » et ses '+consts.length+' constellations ?', ()=>deleteFolder(folder.id)); };
+    if(!consts.length) fbody.innerHTML='<div class="reg-empty" style="padding:8px 12px;text-align:left">Aucune constellation</div>';
+    else consts.forEach(c=>{ const item=document.createElement('div'); item.className='reg-item'; item.innerHTML=`<div class="reg-item-name">${esc(c.name)}</div><button class="reg-item-del" title="Supprimer">✕</button>`; item.onclick=()=>selectConst(c.name); item.querySelector('.reg-item-del').onclick=(e)=>{ e.stopPropagation(); deleteConst(c.id); }; fbody.appendChild(item); });
+    body.appendChild(div);
+  });
+}
+function selectConst(name){ $('inp-name').value=name; document.querySelectorAll('.reg-item').forEach(i=>i.classList.toggle('selected', i.querySelector('.reg-item-name').textContent===name)); if(currentMode==='categorie') setMode('une'); updatePreview(); }
+function openModalFolder(){ $('modal-folder').classList.add('open'); $('mf-name').focus(); }
+function openModalConst(){
+  const sel=$('mc-folder'); sel.innerHTML='';
+  if(!REGISTRY.folders.length){ hint('Créez d\'abord un dossier.'); return; }
+  [...REGISTRY.folders].sort((a,b)=>a.name.localeCompare(b.name)).forEach(f=>{ const o=document.createElement('option'); o.value=f.id; o.textContent=f.name+' ('+f.cat+')'; sel.appendChild(o); });
+  $('modal-const').classList.add('open'); $('mc-name').focus();
+}
+function closeModal(id){ $(id).classList.remove('open'); }
+function closeModalIf(e,id){ if(e.target===$(id)) closeModal(id); }
+function confirmBox(text, cb){ $('mcf-text').textContent=text; $('mcf-ok').onclick=()=>{ closeModal('modal-confirm'); cb(); }; $('modal-confirm').classList.add('open'); }
+function saveFolder(){ const name=$('mf-name').value.trim(), cat=$('mf-cat').value; if(!name) return; REGISTRY.folders.push({id:'f'+Date.now(),name,cat}); saveRegistry(); renderRegistry(); closeModal('modal-folder'); $('mf-name').value=''; }
+function saveConst(){ const name=$('mc-name').value.trim(), folderId=$('mc-folder').value; if(!name) return; REGISTRY.constellations.push({id:'c'+Date.now(),name,folderId}); saveRegistry(); renderRegistry(); closeModal('modal-const'); $('mc-name').value=''; }
+function deleteFolder(id){ REGISTRY.folders=REGISTRY.folders.filter(f=>f.id!==id); REGISTRY.constellations=REGISTRY.constellations.filter(c=>c.folderId!==id); saveRegistry(); renderRegistry(); }
+function deleteConst(id){ REGISTRY.constellations=REGISTRY.constellations.filter(c=>c.id!==id); saveRegistry(); renderRegistry(); }
+
+/* ════════════════════════════════════════════════════
+   MESSAGES & APERÇU
+════════════════════════════════════════════════════ */
+function getName(){ return $('inp-name').value.trim()||'Constellation'; }
+function resolveTemplate(tmpl){
+  const m=MODES.find(x=>x.id===currentMode)||MODES[0]; let prefix=m.prefix;
+  if(!m.plural) prefix=prefix.replace('%N',getName());
+  if(prefix.indexOf('%C')!==-1){ const sel=$('inp-catmode'); const def=CAT_DEFS.find(c=>c.id===(sel?sel.value:''))||CAT_DEFS[0]; prefix=prefix.replace('%C',def.phrase); }
+  const inc=$('inp-incarnation').value.trim(), gold=$('inp-gold').value.trim();
+  let t=tmpl.replace(/%G/g, gold?(gold+' G'):'plusieurs milliers de G');
+  if(t.indexOf('%I')!==-1) t=t.replace(/%I/g, inc?('l’incarnation « '+inc+' »'):'vous');
+  if(tmpl.indexOf('%P')===-1){ let solo='['+t.trim(); if(!/[.!?…»\]]$/.test(solo)) solo+='.'; return solo+']'; }
+  let body=t.replace('%P','').trim(); if(m.plural) body=conjPl(body);
+  let msg=body?('['+prefix+' '+body):('['+prefix); if(!/[.!?…»\]]$/.test(msg)) msg+='.'; return msg+']';
+}
+function applyTemplate(tmpl){ currentTmpl=tmpl; const msg=resolveTemplate(tmpl); $('inp-full').value=msg; showNotif(msg); }
+function updatePreview(){ if(currentTmpl){ const msg=resolveTemplate(currentTmpl); $('inp-full').value=msg; showNotif(msg); } else updateCatTag(); }
+function updatePreviewFull(){ currentTmpl=''; showNotif($('inp-full').value.trim()); }
+function clearMessage(){ currentTmpl=''; $('inp-full').value=''; showNotif(''); }
+function setFont(f){ currentFont=f; applyFontClass(); saveDefaultsSoon(); }
+function applyFontClass(){ const el=$('txt'); if(el) el.className='notif-text font-'+currentFont; }
+function renderMarkup(txt){ let h=esc(txt); h=h.replace(/\{(or|sang|cyan|violet|vert|bleu|rose|argent)\}([\s\S]*?)\{\/(?:\1)?\}/g,'<span class="mk-$1">$2</span>'); return h.replace(/\n/g,'<br>'); }
+function mkInsertLine(){ const ta=$('inp-full'); const a=ta.selectionStart,b=ta.selectionEnd; ta.value=ta.value.slice(0,a)+'\n'+ta.value.slice(b); ta.selectionStart=ta.selectionEnd=a+1; ta.focus(); updatePreviewFull(); }
+function mkWrap(tag){ const ta=$('inp-full'); const a=ta.selectionStart,b=ta.selectionEnd; const sel=ta.value.slice(a,b)||'texte'; ta.value=ta.value.slice(0,a)+'{'+tag+'}'+sel+'{/'+tag+'}'+ta.value.slice(b); ta.selectionStart=a+tag.length+2; ta.selectionEnd=ta.selectionStart+sel.length; ta.focus(); updatePreviewFull(); }
+function currentCatDef(){
+  if(currentMode==='categorie'){ const sel=$('inp-catmode'); return CAT_DEFS.find(c=>c.id===(sel?sel.value:''))||null; }
+  if(currentMode==='une'){ const nm=getName().toLowerCase(); const c=REGISTRY.constellations.find(x=>x.name.toLowerCase()===nm); if(c){ const f=REGISTRY.folders.find(f=>f.id===c.folderId); if(f) return CAT_DEFS.find(d=>d.nom===f.cat)||{ic:'✦',nom:f.cat}; } }
+  return null;
+}
+function updateCatTag(){ const tag=$('notif-cat'); const def=$('opt-cattag').checked?currentCatDef():null; if(def){ tag.innerHTML='<b>'+esc(def.ic)+'</b>'+esc(def.nom); tag.classList.add('on'); } else tag.classList.remove('on'); }
+function starsSvg(seed){
+  let a=(seed>>>0)||7; const rnd=()=>{a=(a*1664525+1013904223)>>>0;return a/4294967296;};
+  const pts=[]; for(let i=0;i<22;i++) pts.push([rnd()*1000,rnd()*260]);
+  let h=''; pts.forEach((p,i)=>{ h+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="'+(0.6+rnd()*1.4).toFixed(2)+'"/>'; if(i&&rnd()<.55){const q=pts[i-1]; h+='<path d="M'+q[0].toFixed(1)+' '+q[1].toFixed(1)+' L'+p[0].toFixed(1)+' '+p[1].toFixed(1)+'"/>';} });
+  return h;
+}
+function currentSeed(txt){ let seed=0; for(const ch of getName()) seed=(seed*31+ch.charCodeAt(0))>>>0; return seed+(txt||'').length; }
+function showNotif(txt){
+  const card=$('card');
+  if(!txt){ card.style.display='none'; $('empty').style.display='block'; return; }
+  $('txt').innerHTML=renderMarkup(txt); applyFontClass(); updateCatTag();
+  $('n-stars').innerHTML=starsSvg(currentSeed(txt));
+  if(card.style.display==='none'){ card.style.animation='none'; void card.offsetWidth; card.style.animation=''; }
+  card.style.display='block'; $('empty').style.display='none';
+}
+
+/* ════════════════════════════════════════════════════
+   BIBLIOTHÈQUE (défaut + « Mes messages »)
+════════════════════════════════════════════════════ */
+function buildCatsUI(){
+  const q=($('lib-search').value||'').toLowerCase();
+  const cats=[...LIBRARY.cats.map(c=>Object.assign({custom:true},c)), ...buildCats(currentMode)];
+  const container=$('cats-container'); container.innerHTML='';
+  cats.forEach((cat,ci)=>{
+    const items=cat.items.map(it=>({raw:it, preview:resolveTemplate(it)})).filter(x=>!q||x.preview.toLowerCase().includes(q)||x.raw.toLowerCase().includes(q));
+    if(q&&!items.length) return;
+    const sec=document.createElement('div'); sec.className='cat-section';
+    const hdr=document.createElement('button'); hdr.className='cat-header';
+    hdr.innerHTML=`<div class="cat-header-left"><div class="cat-dot" style="background:${cat.color};box-shadow:0 0 6px ${cat.color}88"></div><div class="cat-name" style="color:${cat.color}">${esc(cat.name)}</div><div class="cat-count">${items.length} variante${items.length>1?'s':''}${cat.custom?' · perso':''}</div></div><div class="cat-arrow ${q?'open':''}">▶</div>`;
+    const body=document.createElement('div'); body.className='cat-body'+(q?' open':'');
+    items.forEach(x=>{
+      const btn=document.createElement('button'); btn.className='pbtn'; btn.onclick=()=>applyTemplate(x.raw);
+      btn.innerHTML='<div class="pbtn-txt">'+esc(x.preview)+'</div>'+(cat.custom?'<span class="pbtn-del" title="Retirer">✕</span>':'');
+      if(cat.custom) btn.querySelector('.pbtn-del').onclick=(e)=>{ e.stopPropagation(); cat.items.splice(cat.items.indexOf(x.raw),1); if(!cat.items.length) LIBRARY.cats=LIBRARY.cats.filter(c=>c.name!==cat.name); saveLibrary(); buildCatsUI(); };
+      body.appendChild(btn);
+    });
+    hdr.onclick=()=>{ const o=body.classList.contains('open'); body.classList.toggle('open',!o); hdr.querySelector('.cat-arrow').classList.toggle('open',!o); };
+    sec.appendChild(hdr); sec.appendChild(body); container.appendChild(sec);
+  });
+}
+function migrateSaved(){
+  if(!Array.isArray(LIBRARY.saved)) LIBRARY.saved=[];
+  const old=LIBRARY.cats.find(c=>c.name==='Mes messages');
+  if(old){ old.items.forEach(t=>{ if(!LIBRARY.saved.some(x=>x.text===t)) LIBRARY.saved.push({id:'s'+Date.now()+Math.random().toString(36).slice(2,6),name:t.replace(/^\s*\[|\]\s*$/g,'').slice(0,42),ts:Date.now(),text:t}); }); LIBRARY.cats=LIBRARY.cats.filter(c=>c!==old); saveLibrary(); }
+}
+function saveMessage(){ const raw=$('inp-full').value.trim(); if(!raw) return hint('Écris d\'abord un message.'); $('ms-name').value=raw.replace(/^\s*\[|\]\s*$/g,'').replace(/\{[^}]*\}/g,'').slice(0,42); $('modal-save').classList.add('open'); $('ms-name').focus(); $('ms-name').onkeydown=e=>{ if(e.key==='Enter') saveMessageConfirm(); }; }
+function saveMessageConfirm(){
+  const p=buildPayload(); if(!p) return; closeModal('modal-save');
+  const name=$('ms-name').value.trim()||p.text.slice(0,42);
+  LIBRARY.saved=LIBRARY.saved||[]; LIBRARY.saved.unshift(Object.assign({},p,{id:'s'+Date.now().toString(36),name,cname:p.name,ts:Date.now()}));
+  saveLibrary(); renderSaved(); showTab('saved'); hint('Enregistré dans « Mes messages ».');
+}
+function renderSaved(){
+  const box=$('saved-body'); if(!box) return; const q=($('lib-search').value||'').toLowerCase(); const list=(LIBRARY.saved||[]).filter(x=>!q||(x.name+' '+x.text).toLowerCase().includes(q));
+  $('saved-n').textContent=(LIBRARY.saved||[]).length; box.innerHTML='';
+  if(!list.length){ box.innerHTML='<div class="saved-empty">AUCUN MESSAGE ENREGISTRÉ<br>Compose un message, puis « ＋ Enregistrer dans mes messages » sous l\'aperçu : texte, couleur, son et réglages seront gardés ensemble.</div>'; return; }
+  list.forEach(x=>{ const col=x.theme==='custom'?(x.vars?x.vars['--t-main2']:'#888'):(x.theme?themeColor(x.theme):'#38e0ff'); const d=document.createElement('div'); d.className='saved-card'; d.style.setProperty('--sc',col);
+    const dt=new Date(x.ts||0); const tg=x.targets==='all'||!x.targets?'tous':(x.targets||[]).map(id=>(USERS.find(u=>u.id===id)||{}).name||'?').join(', ');
+    d.innerHTML=`<div class="sc-name"><span class="sc-dot"></span>${esc(x.name||'Sans nom')}</div><div class="sc-txt">${esc(x.text)}</div><div class="sc-meta">${esc(dt.toLocaleDateString('fr-FR'))}${x.name&&x.mode?' · '+esc((MODES.find(m=>m.id===x.mode)||{}).label||x.mode):''}${x.sound?' · '+esc(x.sound):''} · ${esc(tg)}</div><div class="sc-btns"><button class="reg-btn sc-cast">◈ Diffuser</button><button class="reg-btn reg-btn-folder">Charger</button><button class="reg-btn sc-del" title="Supprimer">✕</button></div>`;
+    const [bCast,bLoad,bDel]=d.querySelectorAll('button');
+    bCast.onclick=()=>{ loadPayload(x,true); setTimeout(broadcast,60); };
+    bLoad.onclick=()=>loadPayload(x);
+    bDel.onclick=()=>confirmBox('Supprimer « '+(x.name||x.text.slice(0,30))+' » de mes messages ?',()=>{ LIBRARY.saved=LIBRARY.saved.filter(y=>y!==x); saveLibrary(); renderSaved(); });
+    box.appendChild(d); });
+}
+function showTab(id){ document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===id)); document.querySelectorAll('.tab-pane').forEach(p=>p.classList.toggle('active',p.id==='tab-'+id)); }
+function addToLibrary(){
+  const raw=$('inp-full').value.trim(); if(!raw) return hint('Écris d\'abord un message.');
+  let cat=LIBRARY.cats.find(c=>c.name==='Mes messages'); if(!cat){ cat={name:'Mes messages',color:'#ffd070',items:[]}; LIBRARY.cats.unshift(cat); }
+  /* On mémorise le texte brut : le préfixe reste tel quel (le message est déjà résolu) */
+  if(!cat.items.includes(raw)) cat.items.push(raw);
+  saveLibrary(); buildCatsUI(); hint('Ajouté à « Mes messages ».');
+}
+
+/* ════════════════════════════════════════════════════
+   DIFFUSION
+════════════════════════════════════════════════════ */
+function buildPayload(){
+  const raw=$('inp-full').value.trim(); if(!raw) return null;
+  const s=collectSettings(); const def=s.cattag?currentCatDef():null;
+  return {
+    text: raw, html: renderMarkup(raw), font: s.font, theme: s.theme, vars: s.theme==='custom'?nmCustomVars(s.cMain,s.cGlow):null,
+    cat: def?{ic:def.ic,nom:def.nom}:null, top: s.top, bot: s.bot, image: $('opt-image').value.trim(),
+    duration: s.duration, dismiss: s.dismiss, position: s.position, width: s.width, zoom: s.zoom,
+    sound: s.sound, soundPath: s.sound==='custom'?s.soundPath:'', volume: s.volume, chat: s.chat,
+    targets: targets==='all'?'all':[...targets], gmToo: s.gmToo, seed: currentSeed(raw), mode: currentMode, name: getName()
+  };
+}
+function broadcast(){
+  const p=buildPayload(); if(!p) return hint('Aucun message à diffuser.');
+  saveDefaults();
+  if(EMBED){ send('nm-broadcast',{payload:p}); const b=$('btn-cast'); b.classList.remove('flash'); void b.offsetWidth; b.classList.add('flash'); hint('Diffusion envoyée.'); }
+  else { HISTORY.unshift(Object.assign({ts:Date.now(),from:'Test'},p)); HISTORY=HISTORY.slice(0,50); lsSet(LS.history,HISTORY); renderHistory(); hint('Mode autonome : diffusion simulée (voir historique).'); }
+}
+function renderHistory(){
+  const box=$('hist-body'); box.innerHTML=''; const hn=$('hist-n'); if(hn) hn.textContent=HISTORY.length;
+  if(!HISTORY.length){ box.innerHTML='<div class="reg-empty">Aucune diffusion pour l\'instant</div>'; return; }
+  HISTORY.forEach(h=>{
+    const d=document.createElement('div'); d.className='hist-row';
+    const col=h.theme==='custom'?(h.vars?h.vars['--t-main2']:'#888'):themeColor(h.theme);
+    const dt=new Date(h.ts||0); const when=dt.toLocaleDateString('fr-FR')+' '+dt.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    const tg=h.targets==='all'?'tous':(h.targets||[]).map(id=>(USERS.find(u=>u.id===id)||{}).name||'?').join(', ');
+    d.innerHTML=`<span class="hist-dot" style="background:${col};box-shadow:0 0 6px ${col}"></span><div class="hist-txt" title="${esc(h.text)}">${esc(h.text)}</div><div class="hist-meta">${esc(when)} · ${esc(tg)}${h.sound?' · '+esc(h.sound):''}</div><button class="reg-btn reg-btn-folder">Charger</button><button class="reg-btn reg-btn-new">Rejouer</button>`;
+    const [bLoad,bReplay]=d.querySelectorAll('button');
+    bLoad.onclick=()=>loadPayload(h);
+    bReplay.onclick=()=>{ if(EMBED) send('nm-replay',{id:h.id}); else hint('Rejeu disponible dans Foundry.'); };
+    box.appendChild(d);
+  });
+}
+function loadPayload(h,quiet){
+  applySettings({theme:h.theme, cMain:h.vars?h.vars['--t-main2']:undefined, cGlow:h.vars?undefined:undefined, font:h.font, duration:h.duration, dismiss:h.dismiss, position:h.position, width:h.width, zoom:h.zoom, chat:h.chat, sound:h.sound, soundPath:h.soundPath, volume:h.volume, cattag:!!h.cat, top:h.top, bot:h.bot, gmToo:h.gmToo});
+  if(h.mode&&MODES.find(m=>m.id===h.mode)) setMode(h.mode);
+  if(h.cname||h.name) $('inp-name').value=h.cname||h.name;
+  $('opt-image').value=h.image||''; updateImage();
+  targets = h.targets==='all' ? 'all' : new Set(h.targets||[]); if(targets!=='all'&&!targets.size) targets='all'; renderUsers();
+  currentTmpl=''; $('inp-full').value=h.text; showNotif(h.text);
+  if(!quiet) window.scrollTo({top:0,behavior:'smooth'});
+}
+function clearHistory(){ confirmBox('Vider l\'historique des diffusions ?', ()=>{ HISTORY=[]; renderHistory(); if(EMBED) send('nm-history-clear'); else lsSet(LS.history,[]); }); }
+
+/* ── export image (secondaire) ── */
+const EXPORT_FORMATS={ png3:{scale:3,mime:'image/png',q:undefined,ext:'png',bg:null}, png15:{scale:1.5,mime:'image/png',q:undefined,ext:'png',bg:null}, webp:{scale:2,mime:'image/webp',q:0.9,ext:'webp',bg:null}, jpg:{scale:2,mime:'image/jpeg',q:0.85,ext:'jpg',bg:'#020208'} };
+function exportFileName(ext){ let t=($('txt').textContent||'notification').replace(/^\s*\[|\]\s*$/g,'').replace(/[\n\r]+/g,' ').trim().replace(/[\\/:*?"<>|«»“”]/g,'').replace(/\s+/g,' ').trim().replace(/[.…!?\s]+$/,''); if(t.length>90) t=t.slice(0,90).trim()+'…'; return (t||'notification')+'.'+ext; }
+function exportPng(){
+  const card=$('card'); if(card.style.display==='none') return hint('Génère d\'abord une notification.');
+  if(typeof html2canvas==='undefined') return hint('Export image indisponible (html2canvas non chargé : connexion internet requise).');
+  const fmt=EXPORT_FORMATS[$('exp-format').value]||EXPORT_FORMATS.png3;
+  const scan=card.querySelector('.scan'); if(scan) scan.style.display='none';
+  const anim=[card,...card.querySelectorAll('*')]; anim.forEach(el=>{el.style.animation='none';});
+  html2canvas(card,{backgroundColor:fmt.bg,scale:fmt.scale,useCORS:true,logging:false,imageTimeout:0,allowTaint:true}).then(cv=>{
+    if(scan) scan.style.display=''; anim.forEach(el=>{el.style.animation='';});
+    let url=cv.toDataURL(fmt.mime,fmt.q); let ext=fmt.ext; if(url.indexOf('data:'+fmt.mime)!==0) ext='png';
+    const a=document.createElement('a'); a.download=exportFileName(ext); a.href=url; a.click();
+  }).catch(()=>{ if(scan) scan.style.display=''; anim.forEach(el=>{el.style.animation='';}); hint('Échec de l\'export image.'); });
+}
+
+/* ── fond stellaire ── */
+(function(){
+  const c=$('stars'); if(!c) return; const ctx=c.getContext('2d'); let stars=[],w,h;
+  function resize(){w=c.width=innerWidth;h=c.height=innerHeight;stars=[];const n=Math.round(w*h/7000);for(let i=0;i<n;i++)stars.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.3+.2,a:Math.random()*6,s:Math.random()*.02+.004,c:Math.random()<.8?'#cfe0ff':(Math.random()<.5?'#ffd9a0':'#c0a0ff')});}
+  resize(); addEventListener('resize',resize);
+  function draw(){ctx.clearRect(0,0,w,h);for(const s of stars){s.a+=s.s;ctx.globalAlpha=.3+.6*Math.abs(Math.sin(s.a));ctx.fillStyle=s.c;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,7);ctx.fill();}
+    ctx.globalAlpha=.07;ctx.strokeStyle='#8fb0ff';ctx.lineWidth=.6;for(let i=0;i<stars.length;i+=41){const a=stars[i],b=stars[(i+17)%stars.length];if(Math.hypot(a.x-b.x,a.y-b.y)<170){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}}
+    ctx.globalAlpha=1;requestAnimationFrame(draw);}
+  requestAnimationFrame(draw);
+})();
+
+/* ════════════════════════════════════════════════════
+   INIT & PONT
+════════════════════════════════════════════════════ */
+function buildSoundSelect(){ const s=$('opt-sound'); s.innerHTML=SOUND_LIST.map(x=>'<option value="'+x.id+'">'+esc(x.label)+'</option>').join(''); s.value='neutre'; }
+function init(data){
+  REGISTRY=data.registry||{folders:[],constellations:[]}; seedRegistry();
+  LIBRARY=Object.assign({cats:[],presets:[],saved:[]}, data.library||{}); HISTORY=data.history||[]; USERS=data.users||[]; migrateSaved(); renderSaved();
+  renderRegistry(); renderPresets(); renderUsers(); buildCatsUI(); renderHistory();
+  applySettings(Object.assign({theme:'bleu'}, data.defaults||{}), true);
+  if(data.sub) $('app-sub').textContent=data.sub;
+}
+buildThemes(); buildCatSelect(); buildModes(); buildSoundSelect(); setTheme('bleu', true);
+document.querySelectorAll('.cast-body input, .cast-body select, .cast-bar input, #c-main, #c-glow').forEach(el=>el.addEventListener('change', saveDefaultsSoon));
+$('inp-name').addEventListener('keydown', e=>{ if(e.key==='Enter') updatePreview(); });
+
+if(EMBED){
+  window.addEventListener('message', ev=>{
+    const m=ev.data||{}; if(typeof m.type!=='string'||!m.type.startsWith('nm-')) return;
+    if(m.type==='nm-init') init(m);
+    else if(m.type==='nm-users'){ USERS=m.users||[]; renderUsers(); }
+    else if(m.type==='nm-history'){ HISTORY=m.history||[]; renderHistory(); }
+    else if(m.type==='nm-picked'){ if(m.what==='sound'){ $('opt-sound').value='custom'; onSoundChange(); $('opt-soundpath').value=m.path||''; } else if(m.what==='image'){ $('opt-image').value=m.path||''; updateImage(); } saveDefaultsSoon(); }
+    else if(m.type==='nm-tokens') setTargets(m.ids);
+    else if(m.type==='nm-registry'){ REGISTRY=m.registry||REGISTRY; renderRegistry(); }
+    else if(m.type==='nm-hint') hint(m.text||'');
+  });
+  send('nm-ready');
+} else {
+  init({ registry:lsGet(LS.registry,null), library:lsGet(LS.library,null), defaults:lsGet(LS.defaults,null), history:lsGet(LS.history,[]),
+         users:[{id:'u1',name:'Gillemium',color:'#ff8040',active:true},{id:'u2',name:'Lyra',color:'#40c0ff',active:false},{id:'gm',name:'MJ',color:'#fff',active:true,isGM:true}], sub:'Mode autonome (hors Foundry)' });
+}
+
+</script>
+</body>
+</html>

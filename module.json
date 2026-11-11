@@ -1,8 +1,8 @@
 {
   "id": "notifications-manhwa",
-  "title": "Notifications Manhwa — Canal des constellations",
+  "title": "Notifications - Manhwa",
   "description": "Diffusez en direct aux joueurs des notifications « fenêtre système » à la manière des manhwas (Omniscient Reader) : 13 modes d'émetteur, registre de constellations par dossiers, bibliothèque de plus de 500 messages avec accord automatique du pluriel, balises de couleur, 22 thèmes + couleurs personnalisées, 5 polices, 15 sons synthétisés (ominous, upbeat, neutre, alerte, abysse…) ou fichier audio au choix, durée, position, taille, ciblage par joueur ou par tokens, copie dans le chat, historique et rejeu, journal côté joueur, préréglages d'ambiance et API pour les autres modules.",
-  "version": "1.0.0",
+  "version": "1.2.2",
   "authors": [
     {
       "name": "Bastien"
